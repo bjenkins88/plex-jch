@@ -1,151 +1,199 @@
 # Where Do I Find It?
 
-An "ask layer" architecture for Jenkins Design Build company knowledge —
-not a rebuilt intranet wiki. Real documents stay on the office Synology,
-Paylocity stays the HR system of record, BuilderTrend stays the jobs
-system of record. The ZGX Nano's existing local AI stack answers "where
-do I find X" by indexing and pointing into them, reusing the same
-ingestion pattern already proven on the in-progress Phase 8 media-search
-pipeline.
+An "ask layer" over the files that already exist, plus a small set of
+real **workflows** pulled out of the current Google Site — so a
+confused person has a place to start, and a specific person has a place
+to ask. Real documents stay on the office Synology, Paylocity stays the
+HR system of record, BuilderTrend stays the jobs system of record. The
+ZGX Nano's existing local AI stack answers "where do I find X" by
+indexing and pointing into them, reusing the same ingestion pattern
+already proven on the in-progress Phase 8 media-search pipeline.
 
 Rendered version with diagrams: https://claude.ai/code/artifact/98aadf3e-9cab-4b8a-9240-5a52a0f2cbd8
 
 ## A0 — The scope line
 
-Unchanged from the first draft: everything on the job-and-trade side
-stays in BuilderTrend. Everything on the company-and-people side is what
-the assistant can answer. Test: *does this describe how we build a
-house, or how we run the company that builds houses?* The `jdb_costs`
-data the ZGX already pulls from BuilderTrend (Phase 3/7) is a separate
-concern — financial reporting, not "where do I find the procedure."
+Unchanged: everything on the job-and-trade side stays in BuilderTrend.
+Everything on the company-and-people side is what this system covers.
+Test: *does this describe how we build a house, or how we run the
+company that builds houses?* BuilderTrend access itself (getting an
+account, clocking in/out) is IT's job and stays in scope — using
+BuilderTrend once you're in it doesn't.
 
 ## A1 — Ask, not publish
 
-The original plan proposed rebuilding the Google Site into a proper
-wiki. The real problem is different: the procedures likely already exist
-somewhere, but nobody can tell you which somewhere — and centralizing
-them onto a new site just creates a second somewhere that also goes
-stale. The fix: leave files where they already live (Synology, Paylocity,
-BuilderTrend) and build a thin layer that knows where everything is and
-answers in plain language. It doesn't go stale the way a wiki does
-because it re-reads the real folders on a schedule instead of holding a
-second copy of the truth.
+The current site already tries to do this — its homepage says "there
+are several questions that this site attempts to answer," then lists
+them. That instinct was right; it just had to be maintained by hand,
+page by page, forever. Leave real files where they already live
+(Synology, Paylocity, BuilderTrend) and build a thin layer that knows
+where everything is and answers in plain language, re-reading the real
+folders on a schedule instead of holding a second copy of the truth.
 
-Most of this already exists. The ZGX Nano runs Ollama + Open WebUI as a
-private local chat interface today, and the in-progress Phase 8 media
-pipeline already proved the exact mechanism needed: pull files from the
-real office Synology over a restricted SFTP account, extract and embed
-content, store it in Postgres/pgvector, surface it through Open WebUI —
-currently aimed at photos and video. Pointing the same pipeline at
-documents is the same build, not a new one.
+The ZGX Nano already runs the pipeline this needs: pull files from the
+office Synology over a restricted account, extract and embed content,
+store it in pgvector, surface it through Open WebUI — proven on the
+in-progress Phase 8 media pipeline. Pointing it at documents is the same
+build, not a new one.
 
 ## A2 — Three tiers
 
 - **Source** (systems of record, untouched): office Synology (docs,
   forms), Paylocity (HR self-service), BuilderTrend (jobs, field), plus
-  one hand-written `_routing-index.md` that maps non-file answers to the
-  right system.
+  `_routing-index.md` and `_start-here.md`.
 - **Index** (nightly, via n8n): restricted SFTP pull → extract & embed
-  text → upsert into a new `company_docs` pgvector table — same pattern
+  text → upsert into a `company_docs` pgvector table — same pattern
   already running for Phase 8.
-- **Ask** (Open WebUI, at the office and over the existing WireGuard
-  VPN): answers "where's the expense form?" or "who approves a PO?" with
-  the real file path, or a pointer to Paylocity/BuilderTrend.
+- **Ask** (Open WebUI + the Google Site's homepage): answers a specific
+  question, walks a workflow step by step, or hands over the Start Here
+  menu when a question is too vague to match anything.
 
-Nothing in the index tier is a second copy of the truth — it's rebuilt
-every night, so it's never more than a day stale even if no one touches
-it.
+## A3 — Policy vs. workflow: two kinds of content
 
-## A3 — The folder plan
+The current site already mixes two very different things under one
+roof, and that's a real source of "where do I even start." Look at
+what's actually sitting under **Company Policies** today: the Team
+Member Handbook (a real policy — safety rules, social media policy) sits
+right next to "Backing up your Hard Drive" and the referral program —
+neither of which is a policy. One is a fact you look up once. The other
+is a sequence of steps you follow in order, sometimes with a decision in
+the middle ("only when pre-approved by your supervisor").
 
-Same eight-section taxonomy as the first draft, now describing Synology
-folders instead of web pages:
+**Reference — look it up, done:** BuilderTrend login, server address,
+holiday/safety/social media policy, logo files, signature line template.
+
+**Workflow — steps, in order, sometimes a decision:** parking a call on
+the desk phone (4 steps), backing up a laptop (install → point at
+`jdbsrv` → sign in → set Continuous Backup), booking the conference room
+(add the calendar → use it as your meeting location), requesting
+work-from-home (supervisor pre-approval → checklist form), the Jenkins
+Finder's referral program (get contact info → send to Sales *before*
+they reach out → $1,000 gift card).
+
+This matters for the AI too: a reference fact is safe to retrieve and
+quote. A workflow is **not safe to paraphrase** — a model summarizing
+"backing up your hard drive" could quietly drop the Continuous Backup
+step. Workflow files get tagged as a distinct type (a `WORKFLOW-`
+filename prefix is enough) and the assistant is instructed to return
+them as literal numbered steps, never a summary.
+
+## A4 — The folder plan
+
+Same eight-section taxonomy as before, now with real files in it —
+reference and workflow content side by side, tagged, not split into
+different systems:
 
 ```
 /Company/
-  01-New-Hire-Hub/       — pre-day-one, Day 1, Week 1, 30/60/90, who's who
-  02-HR/                 — handbook, PTO & holiday policy, reviews, conduct, offboarding
-  03-IT/                 — accounts, equipment, security policy, helpdesk, remote access
-  04-Administrative/     — expenses, purchasing, vehicles, travel, facilities
-  05-Company-Procedures/ — how to request time off, submit an expense, get IT help
+  01-New-Hire-Hub/
+  02-HR/
+    POLICY-team-member-handbook.pdf   (exported from the Google Doc)
+    WORKFLOW-request-time-off.md      (points to Paylocity)
+  03-IT/
+    WORKFLOW-phone-system.md          (Zoom Phone, parking a call, Polycom steps)
+    WORKFLOW-backup-setup.md          (Synology Drive client, Continuous Backup)
+    WORKFLOW-book-conference-room.md
+    REFERENCE-buildertrend-access.md
+  04-Administrative/                  (logo files, signature line, brand assets)
+  05-Company-Procedures/
+    WORKFLOW-request-wfh.md
+    WORKFLOW-referral-program.md      (Jenkins Finder's Program)
   06-Directory-Org-Chart/
   07-Forms/
-  _routing-index.md      — "if it's not here, it's in Paylocity / BuilderTrend / ..."
+  _routing-index.md                   ("if it's not here, it's in Paylocity / BuilderTrend / ...")
+  _start-here.md                      (the menu from A5)
 ```
 
-Each top-level folder gets a short `README.md` at its root — readable by
-a person browsing File Station, and embedded by the pipeline as a strong
-topic summary that measurably improves retrieval over raw files with no
-orientation.
+## A5 — Start Here: the workflow menu
 
-## A4 — How it actually answers
+The direct answer to "some people won't know where to start to ask
+questions." The homepage already half-built this — a short bulleted
+list of the questions the site answers. Formalize that instinct into a
+menu organized by real-world trigger, not by department, because a
+confused person knows "I need to book a room," not "which department
+owns room booking":
 
-**Ingestion (reuse, don't rebuild):** a restricted DSM account (same
-pattern as the existing `aiuser1`), scoped by folder ACL to exactly the
-seven A3 folders. Nightly n8n job: SFTP pull changed files → extract
-text (Word/PDF/Excel) → embed → upsert into `company_docs`, keyed by
-file path. `_routing-index.md` gets embedded the same pass, which is how
-the assistant answers questions that aren't a file at all.
+| If this is you... | Go here |
+|---|---|
+| Starting a new job | New Hire Hub |
+| Requesting time off or sick time | Paylocity |
+| Need to work from home | Workflow: request-wfh |
+| Booking the conference room | Workflow: book-conference-room |
+| Something's wrong with my phone/computer | Workflow: phone-system / backup-setup |
+| Want to refer a friend | Workflow: referral-program |
+| Have a policy question | Ask the assistant, or open the Handbook |
+| Anything else | Ask the assistant |
+
+One file, two homes: it's `_start-here.md` on the Synology (indexed like
+everything else, so the assistant can open with it when a question is
+too vague to match), **and** it's the Google Site's homepage — kept, not
+retired, because it's already what everyone has bookmarked. The Google
+Site's whole remaining job becomes this one menu.
+
+## A6 — How it actually answers
+
+**Ingestion (reuse, don't rebuild):** restricted DSM account, same
+pattern as the existing `aiuser1`, scoped by folder ACL to exactly the
+A4 folders. Nightly n8n job: SFTP pull → extract text → embed → upsert
+into `company_docs`, keyed by file path. The retrieval prompt
+distinguishes `WORKFLOW-` files (return steps verbatim) from everything
+else (answer and cite).
 
 **What never gets indexed:** comp, disciplinary, medical, and legal
-material — excluded at the file-permission level, not just "the model
-won't mention it," the same way `aiuser1` can't see anything outside
-`photo/` and `video/` today. If HR wants that material searchable later,
-that's a deliberate second build: its own Open WebUI Knowledge
-collection gated by Open WebUI's existing RBAC to the HR role only.
+material — excluded at the file-permission level, the same way
+`aiuser1` can't see outside `photo/` and `video/` today. If HR wants
+that searchable later, it's a separate Open WebUI Knowledge collection
+gated by RBAC to HR only — a deliberate second build.
 
-## A5 — New hire path
-
-Same shape as before, but the action at each step is "ask," not
-"browse": Day 1 includes trying three starter questions live ("where's
-the handbook," "how do I request time off," "who's my IT contact"); Week
-1 trainings live in `01-New-Hire-Hub/`; 30/90-day check-ins and benefits
-reminders point to Paylocity rather than handling enrollment directly.
-
-## A6 — Who maintains it
+## A7 — Who maintains it
 
 | Area | Owner | Job |
 |---|---|---|
-| HR / IT / Admin folders | HR lead · IT lead · admin manager | Keep their Synology folder current — file hygiene, not page editing |
+| HR / IT / Admin folders | HR lead · IT lead · admin manager | Keep files current; turn a process change into an updated `WORKFLOW` file, not a paragraph edit buried in a policy doc |
+| `_start-here.md` | ZGX build owner + HR lead | Keep the menu to ~8 items — it's a menu, not an index of everything |
 | `_routing-index.md` | ZGX build owner | Update when a system of record changes |
 | Index & sync job | ZGX build owner | Watch the nightly n8n run, same discipline as the Bills/media pipelines |
 | Query gaps | ZGX build owner + HR lead | Review monthly what people ask and don't get a good answer to |
 
-## A7 — Build schedule (Phase 8B)
+## A8 — Build schedule (Phase 8B)
 
-Framed as a sibling of the in-progress Phase 8 media pipeline, reusing
-its proven pattern against a different corpus:
+1. **Harvest what already exists** — pull the ~6 real workflows off the
+   current site (phone/Zoom handoff, backup setup, conference room, WFH
+   checklist, referral program, BuilderTrend access) and rewrite each as
+   its own numbered `WORKFLOW-` file. Export the Team Member Handbook
+   off Google Docs onto the Synology as the canonical file.
+2. **Organize the folders** — build the A4 tree on the office Synology,
+   assign owners, write each README.
+3. **Lock down the account** — new restricted DSM account, folder ACLs
+   limited to the A4 folders; verify by trying to browse outside them
+   and failing.
+4. **Adapt the Phase 8 pipeline** — same SFTP + pgvector shape, swap
+   image-captioning for text extraction, add the workflow-vs-reference
+   tagging from A3/A6.
+5. **Rebuild the homepage as Start Here** — replace the current
+   homepage's Q&A prose with the A5 menu; can ship independently of the
+   AI work.
+6. **Pilot, then open it up** — real questions from a few people, check
+   that workflow answers come back as full steps, then announce
+   company-wide.
 
-1. **Organize the folders** — build the A3 tree on the office Synology,
-   assign owners, write each README. No ZGX work needed; can start today.
-2. **Lock down the account** — new restricted DSM account, folder ACLs
-   limited to the seven A3 folders; verify by trying to browse outside
-   them and failing.
-3. **Adapt the Phase 8 pipeline** — same SFTP + pgvector shape, swap
-   image-captioning for text extraction; new `company_docs` table,
-   separate from `media_assets` and `jdb_costs`.
-4. **Write the routing doc** — pure content work, parallel to steps 2–3.
-5. **Pilot, then open it up** — real questions from a few people, fix
-   retrieval gaps, then announce company-wide.
+## A9 — Front door & punch list
 
-## A8 — Front door & punch list
-
-- **At the office** — a shared screen/kiosk with Open WebUI open, logged
-  into a low-privilege company account, somewhere central.
-- **At a desk** — a bookmark to the office Open WebUI URL (a friendlier
-  local hostname than the raw IP if easy to set up).
+- **Don't know where to start** — Google Site homepage → the A5 Start
+  Here menu. No login, no typing a question, just pick your situation.
+- **Know exactly what to ask** — Open WebUI, at the office (kiosk or
+  shared screen) or at a desk via bookmark.
 - **Off-site / jobsite** — the existing WireGuard VPN (Phase 6) already
   covers this.
 
-The Google Site's job shrinks to almost nothing — retire it, or keep one
-landing page with the assistant link and a couple of raw folder
-shortcuts for people who'd rather browse than ask.
-
 Punch list:
-- Every A3 folder has a README and a named owner
-- The restricted account can reach only the seven folders — tested, not assumed
+- Every A4 folder has a README and a named owner
+- All 6 existing workflows are harvested into `WORKFLOW-` files, checked
+  against the original site content for dropped steps
+- The restricted account can reach only the A4 folders — tested, not assumed
 - Comp/disciplinary/medical/legal folders are unreachable by that account
 - The nightly sync runs clean for a full week before go-live
-- `_routing-index.md` covers every system named in A0/A2
-- A real new hire finds HR/IT/admin answers by asking, without asking a person
-- Query log reviewed weekly for the first month to catch retrieval gaps
+- The assistant returns a workflow as its literal steps, not a
+  paraphrase — checked on at least 2 real workflow files
+- A real new hire finds an answer starting from the homepage menu *and*
+  by asking directly, without asking a person
