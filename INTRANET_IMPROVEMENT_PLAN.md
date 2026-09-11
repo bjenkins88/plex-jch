@@ -94,6 +94,7 @@ different systems:
     WORKFLOW-backup-setup.md          (Synology Drive client, Continuous Backup)
     WORKFLOW-book-conference-room.md
     REFERENCE-buildertrend-access.md
+    WORKFLOW-using-the-assistant.md   (exists elsewhere — import, don't rewrite)
   04-Administrative/                  (logo files, signature line, brand assets)
   05-Company-Procedures/
     WORKFLOW-request-wfh.md
@@ -122,7 +123,14 @@ owns room booking":
 | Something's wrong with my phone/computer | Workflow: phone-system / backup-setup |
 | Want to refer a friend | Workflow: referral-program |
 | Have a policy question | Ask the assistant, or open the Handbook |
+| **Don't know how to get to or use the assistant itself** | Workflow: using-the-assistant |
 | Anything else | Ask the assistant |
+
+**Note:** that last row needs its own workflow — assume nobody knows how
+to reach or use the ZGX/Open WebUI on their own. Instructions for this
+already exist elsewhere; this plan doesn't duplicate them, just flags
+that they need a home in `03-IT/` and a line in this menu once folded
+in.
 
 One file, two homes: it's `_start-here.md` on the Synology (indexed like
 everything else, so the assistant can open with it when a question is
@@ -161,7 +169,10 @@ gated by RBAC to HR only — a deliberate second build.
    current site (phone/Zoom handoff, backup setup, conference room, WFH
    checklist, referral program, BuilderTrend access) and rewrite each as
    its own numbered `WORKFLOW-` file. Export the Team Member Handbook
-   off Google Docs onto the Synology as the canonical file.
+   off Google Docs onto the Synology as the canonical file. Fold in the
+   existing "how to reach and use the ZGX assistant" instructions as
+   `WORKFLOW-using-the-assistant.md` — that material already exists,
+   just needs to land here rather than being rewritten.
 2. **Organize the folders** — build the A4 tree on the office Synology,
    assign owners, write each README.
 3. **Lock down the account** — new restricted DSM account, folder ACLs
