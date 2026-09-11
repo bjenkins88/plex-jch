@@ -1,113 +1,151 @@
-# Team Hub Site Plan
+# Where Do I Find It?
 
-A phased plan for rebuilding the New House Builder team intranet
-(sites.google.com/newhousebuilder.com/team) so it covers company-level HR,
-IT, and administrative procedures, while design and construction SOPs
-stay in BuilderTrend.
+An "ask layer" architecture for Jenkins Design Build company knowledge —
+not a rebuilt intranet wiki. Real documents stay on the office Synology,
+Paylocity stays the HR system of record, BuilderTrend stays the jobs
+system of record. The ZGX Nano's existing local AI stack answers "where
+do I find X" by indexing and pointing into them, reusing the same
+ingestion pattern already proven on the in-progress Phase 8 media-search
+pipeline.
 
 Rendered version with diagrams: https://claude.ai/code/artifact/98aadf3e-9cab-4b8a-9240-5a52a0f2cbd8
 
 ## A0 — The scope line
 
-Everything on the job-and-trade side stays in BuilderTrend. Everything on
-the company-and-people side moves to the intranet. Test: *does this
-describe how we build a house, or how we run the company that builds
-houses?*
+Unchanged from the first draft: everything on the job-and-trade side
+stays in BuilderTrend. Everything on the company-and-people side is what
+the assistant can answer. Test: *does this describe how we build a
+house, or how we run the company that builds houses?* The `jdb_costs`
+data the ZGX already pulls from BuilderTrend (Phase 3/7) is a separate
+concern — financial reporting, not "where do I find the procedure."
 
-**Stays in BuilderTrend:** job scheduling & phase sequencing, trade
-partner scopes of work, material selections & spec sheets, change order
-procedure, permitting & inspection checklists (per job), punch list /
-final walkthrough procedure, warranty & callback procedure, daily log /
-field reporting standard.
+## A1 — Ask, not publish
 
-**Moves to the intranet:** IT (accounts, equipment, security, helpdesk),
-HR (handbook, benefits, PTO, reviews, conduct), Admin (expenses,
-purchasing, vehicles, travel), new hire onboarding, culture, org chart,
-company-wide meeting & comms norms, office-level safety & emergency
-contacts.
+The original plan proposed rebuilding the Google Site into a proper
+wiki. The real problem is different: the procedures likely already exist
+somewhere, but nobody can tell you which somewhere — and centralizing
+them onto a new site just creates a second somewhere that also goes
+stale. The fix: leave files where they already live (Synology, Paylocity,
+BuilderTrend) and build a thin layer that knows where everything is and
+answers in plain language. It doesn't go stale the way a wiki does
+because it re-reads the real folders on a schedule instead of holding a
+second copy of the truth.
 
-Exception: office-level safety (fire exits, emergency contacts, workers'
-comp reporting) sits on the intranet; jobsite safety (PPE by trade, OSHA
-logs tied to a project) stays in BuilderTrend.
+Most of this already exists. The ZGX Nano runs Ollama + Open WebUI as a
+private local chat interface today, and the in-progress Phase 8 media
+pipeline already proved the exact mechanism needed: pull files from the
+real office Synology over a restricted SFTP account, extract and embed
+content, store it in Postgres/pgvector, surface it through Open WebUI —
+currently aimed at photos and video. Pointing the same pipeline at
+documents is the same build, not a new one.
 
-## A1 — Audit the existing site first
+## A2 — Three tiers
 
-Before writing anything new, inventory every page on the current site and
-mark each: keep / rewrite / merge / kill / move to BuilderTrend. Also
-check for: orphan pages, duplicates of content that already lives in
-BuilderTrend/Paylocity/Drive, pages with no owner or last-updated date, broken
-navigation paths (count clicks from Home), and permissions on anything
-HR-sensitive.
+- **Source** (systems of record, untouched): office Synology (docs,
+  forms), Paylocity (HR self-service), BuilderTrend (jobs, field), plus
+  one hand-written `_routing-index.md` that maps non-file answers to the
+  right system.
+- **Index** (nightly, via n8n): restricted SFTP pull → extract & embed
+  text → upsert into a new `company_docs` pgvector table — same pattern
+  already running for Phase 8.
+- **Ask** (Open WebUI, at the office and over the existing WireGuard
+  VPN): answers "where's the expense form?" or "who approves a PO?" with
+  the real file path, or a pointer to Paylocity/BuilderTrend.
 
-## A2 — The site plan
+Nothing in the index tier is a second copy of the truth — it's rebuilt
+every night, so it's never more than a day stale even if no one touches
+it.
 
-Eight top-level sections, everything else nests under one of them:
+## A3 — The folder plan
 
-- **Home** — announcements, quick links, search
-- **New Hire Hub** — pre-day-one, Day 1, Week 1, 30/60/90, who's who
-- **HR** — handbook, benefits (link to Paylocity), PTO & holidays, reviews,
-  conduct, offboarding
-- **IT** — new account & hardware, helpdesk, approved software, security
-  policy, remote access
-- **Administrative** — expenses, purchasing authority, vehicles & fuel
-  cards, travel, facilities
-- **Company Procedures** — how to request time off, submit an expense,
-  get IT help, propose a new SOP
-- **Directory & Org Chart**
-- **Forms & Documents Library**
+Same eight-section taxonomy as the first draft, now describing Synology
+folders instead of web pages:
 
-## A3 — New hire path
+```
+/Company/
+  01-New-Hire-Hub/       — pre-day-one, Day 1, Week 1, 30/60/90, who's who
+  02-HR/                 — handbook, PTO & holiday policy, reviews, conduct, offboarding
+  03-IT/                 — accounts, equipment, security policy, helpdesk, remote access
+  04-Administrative/     — expenses, purchasing, vehicles, travel, facilities
+  05-Company-Procedures/ — how to request time off, submit an expense, get IT help
+  06-Directory-Org-Chart/
+  07-Forms/
+  _routing-index.md      — "if it's not here, it's in Paylocity / BuilderTrend / ..."
+```
 
-A path, not a folder: pre-day-one (offer letter, I-9/W-4 in Paylocity, IT
-equipment ordered) → Day 1 (desk/login ready, buddy assigned, handbook
-acknowledgment) → Week 1 (required trainings marked complete) → 30 days
-(manager check-in, benefits enrollment reminder, access review) → 90 days
-(formal review, hub sign-off).
+Each top-level folder gets a short `README.md` at its root — readable by
+a person browsing File Station, and embedded by the pipeline as a strong
+topic summary that measurably improves retrieval over raw files with no
+orientation.
 
-## A4 — Who maintains it
+## A4 — How it actually answers
 
-| Section | Owner | Review cadence |
+**Ingestion (reuse, don't rebuild):** a restricted DSM account (same
+pattern as the existing `aiuser1`), scoped by folder ACL to exactly the
+seven A3 folders. Nightly n8n job: SFTP pull changed files → extract
+text (Word/PDF/Excel) → embed → upsert into `company_docs`, keyed by
+file path. `_routing-index.md` gets embedded the same pass, which is how
+the assistant answers questions that aren't a file at all.
+
+**What never gets indexed:** comp, disciplinary, medical, and legal
+material — excluded at the file-permission level, not just "the model
+won't mention it," the same way `aiuser1` can't see anything outside
+`photo/` and `video/` today. If HR wants that material searchable later,
+that's a deliberate second build: its own Open WebUI Knowledge
+collection gated by Open WebUI's existing RBAC to the HR role only.
+
+## A5 — New hire path
+
+Same shape as before, but the action at each step is "ask," not
+"browse": Day 1 includes trying three starter questions live ("where's
+the handbook," "how do I request time off," "who's my IT contact"); Week
+1 trainings live in `01-New-Hire-Hub/`; 30/90-day check-ins and benefits
+reminders point to Paylocity rather than handling enrollment directly.
+
+## A6 — Who maintains it
+
+| Area | Owner | Job |
 |---|---|---|
-| HR | HR lead | Quarterly, or on any policy change |
-| IT | IT lead / MSP contact | Quarterly, or on any tool/vendor change |
-| Administrative | Office / admin manager | Quarterly |
-| New Hire Hub | HR lead + hiring manager | Every hire; formally every 2 quarters |
-| Structure & template | Intranet curator | Ongoing |
+| HR / IT / Admin folders | HR lead · IT lead · admin manager | Keep their Synology folder current — file hygiene, not page editing |
+| `_routing-index.md` | ZGX build owner | Update when a system of record changes |
+| Index & sync job | ZGX build owner | Watch the nightly n8n run, same discipline as the Bills/media pipelines |
+| Query gaps | ZGX build owner + HR lead | Review monthly what people ask and don't get a good answer to |
 
-Every page carries a footer: Owner / Last reviewed / Next review due.
-One SOP template reused everywhere: Purpose → Scope → Owner → Steps →
-Related forms/links → Related BuilderTrend reference (if any).
+## A7 — Build schedule (Phase 8B)
 
-## A5 — Build schedule
+Framed as a sibling of the in-progress Phase 8 media pipeline, reusing
+its proven pattern against a different corpus:
 
-1. **Foundation** (weeks 1–2) — run the A1 audit, lock the A2 site plan,
-   assign A4 owners, pick the SOP template.
-2. **Framing** (weeks 3–4) — build the nav shell, stub every page, set
-   section-level permissions.
-3. **Rough-in** (weeks 4–7) — write/migrate HR, IT, Admin content; build
-   the New Hire Hub; link out to Paylocity/Drive instead of duplicating.
-4. **Finish-out** (weeks 6–8) — directory & org chart, cross-links to
-   BuilderTrend at the scope line, consistent labeling/search aids.
-5. **Walkthrough** (weeks 8–9) — pilot with one real new hire or one
-   volunteer per department, run the A7 punch list, then announce
-   company-wide.
+1. **Organize the folders** — build the A3 tree on the office Synology,
+   assign owners, write each README. No ZGX work needed; can start today.
+2. **Lock down the account** — new restricted DSM account, folder ACLs
+   limited to the seven A3 folders; verify by trying to browse outside
+   them and failing.
+3. **Adapt the Phase 8 pipeline** — same SFTP + pgvector shape, swap
+   image-captioning for text extraction; new `company_docs` table,
+   separate from `media_assets` and `jdb_costs`.
+4. **Write the routing doc** — pure content work, parallel to steps 2–3.
+5. **Pilot, then open it up** — real questions from a few people, fix
+   retrieval gaps, then announce company-wide.
 
-## A6 — Platform call
+## A8 — Front door & punch list
 
-**Recommendation: stay on Google Sites for this rebuild.** The company is
-already on Google Workspace; the current problem is structure and
-ownership, not the platform. Revisit only if headcount pushes past ~40–50
-people, you need policy sign-off workflows, or search/findability
-complaints persist after A2–A5 are done — then look at Confluence,
-Notion, or SharePoint.
+- **At the office** — a shared screen/kiosk with Open WebUI open, logged
+  into a low-privilege company account, somewhere central.
+- **At a desk** — a bookmark to the office Open WebUI URL (a friendlier
+  local hostname than the raw IP if easy to set up).
+- **Off-site / jobsite** — the existing WireGuard VPN (Phase 6) already
+  covers this.
 
-## A7 — Punch list before occupancy
+The Google Site's job shrinks to almost nothing — retire it, or keep one
+landing page with the assistant link and a couple of raw folder
+shortcuts for people who'd rather browse than ask.
 
-- Every top-level section has a named owner and a review date
-- Nothing on the intranet duplicates a BuilderTrend SOP
-- A new hire can complete IT setup and week-one HR tasks using only the
-  New Hire Hub
-- Every nav item resolves in two clicks or fewer from Home
-- HR-sensitive pages are permission-restricted, not just unlinked
-- Old/duplicate pages from the A1 audit are archived or redirected
-- Home page has a visible "needs attention" list for overdue reviews
+Punch list:
+- Every A3 folder has a README and a named owner
+- The restricted account can reach only the seven folders — tested, not assumed
+- Comp/disciplinary/medical/legal folders are unreachable by that account
+- The nightly sync runs clean for a full week before go-live
+- `_routing-index.md` covers every system named in A0/A2
+- A real new hire finds HR/IT/admin answers by asking, without asking a person
+- Query log reviewed weekly for the first month to catch retrieval gaps
