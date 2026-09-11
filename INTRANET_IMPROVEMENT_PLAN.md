@@ -35,7 +35,7 @@ logs tied to a project) stays in BuilderTrend.
 Before writing anything new, inventory every page on the current site and
 mark each: keep / rewrite / merge / kill / move to BuilderTrend. Also
 check for: orphan pages, duplicates of content that already lives in
-BuilderTrend/Gusto/Drive, pages with no owner or last-updated date, broken
+BuilderTrend/Paylocity/Drive, pages with no owner or last-updated date, broken
 navigation paths (count clicks from Home), and permissions on anything
 HR-sensitive.
 
@@ -45,7 +45,7 @@ Eight top-level sections, everything else nests under one of them:
 
 - **Home** — announcements, quick links, search
 - **New Hire Hub** — pre-day-one, Day 1, Week 1, 30/60/90, who's who
-- **HR** — handbook, benefits (link to Gusto), PTO & holidays, reviews,
+- **HR** — handbook, benefits (link to Paylocity), PTO & holidays, reviews,
   conduct, offboarding
 - **IT** — new account & hardware, helpdesk, approved software, security
   policy, remote access
@@ -58,7 +58,7 @@ Eight top-level sections, everything else nests under one of them:
 
 ## A3 — New hire path
 
-A path, not a folder: pre-day-one (offer letter, I-9/W-4 in Gusto, IT
+A path, not a folder: pre-day-one (offer letter, I-9/W-4 in Paylocity, IT
 equipment ordered) → Day 1 (desk/login ready, buddy assigned, handbook
 acknowledgment) → Week 1 (required trainings marked complete) → 30 days
 (manager check-in, benefits enrollment reminder, access review) → 90 days
@@ -85,7 +85,7 @@ Related forms/links → Related BuilderTrend reference (if any).
 2. **Framing** (weeks 3–4) — build the nav shell, stub every page, set
    section-level permissions.
 3. **Rough-in** (weeks 4–7) — write/migrate HR, IT, Admin content; build
-   the New Hire Hub; link out to Gusto/Drive instead of duplicating.
+   the New Hire Hub; link out to Paylocity/Drive instead of duplicating.
 4. **Finish-out** (weeks 6–8) — directory & org chart, cross-links to
    BuilderTrend at the scope line, consistent labeling/search aids.
 5. **Walkthrough** (weeks 8–9) — pilot with one real new hire or one
