@@ -208,3 +208,56 @@ Punch list:
   paraphrase — checked on at least 2 real workflow files
 - A real new hire finds an answer starting from the homepage menu *and*
   by asking directly, without asking a person
+
+## A10 — Staying evergreen
+
+A workflow is evergreen only if changing it is easier than leaving it
+wrong.
+
+**Three things should trigger a change** — and only one of them is
+"someone remembered":
+
+1. **The system changes** — a vendor swap, a new tool, a new approval
+   chain. This conversation's own Paylocity correction is exactly the
+   kind of drift this has to catch on purpose, not by luck — a payroll
+   switch should trigger a workflow update as part of the rollout, not
+   an afterthought someone notices months later.
+2. **Someone flags it** — a query comes back wrong or empty (caught by
+   the A7 monthly query-gap review), or a person just tells their
+   department owner "this step is wrong now."
+3. **Scheduled review** — the A7 quarterly folder review catches the
+   slow drift nobody happened to notice.
+
+**The loop — no separate "publish" step:**
+
+1. Trigger noticed (any of the three above)
+2. Owner edits the file directly on the Synology, using the template
+   below — no CMS, no ticket, no approval queue for a routine update
+3. The nightly reindex (the same n8n job from A6) picks it up
+   automatically — the owner doesn't do anything extra to "publish" it
+4. Live everywhere — in the assistant within a day, and in
+   `_start-here.md` too if it's common enough to earn a menu line
+
+**Every `WORKFLOW-` file, same shape:**
+- **Trigger** — the real-world situation that sends someone here
+- **Steps** — numbered, in order, decisions called out explicitly
+- **Who to ask if stuck** — a name, not just "IT"
+- **Owner · Last updated** — same footer discipline as A7
+
+**Retiring a workflow:**
+- Move the file to `_archive/`, don't delete it — Synology's own Drive
+  versioning (already in use today) is the real safety net
+- An archived file is excluded from the index — it stops being retrieved
+- Scrub any pointer to it out of `_start-here.md` and
+  `_routing-index.md` in the same edit
+
+**One rule keeps Start Here from becoming the wiki again:** it stays
+capped at ~8 items. Adding a 9th means retiring or merging another —
+gatekept by the same two people who own the file (A7), not a
+free-for-all.
+
+| Who | Can do |
+|---|---|
+| Anyone | Flag a workflow that's wrong, missing, or confusing — to their department owner, informally |
+| Department owner (HR / IT / Admin) | Write and edit any `WORKFLOW-` file in their own folder, on the template above |
+| ZGX build owner + HR lead | The only two who touch `_start-here.md` and `_routing-index.md` — small surface, kept deliberately narrow |
