@@ -145,7 +145,12 @@ pattern as the existing `aiuser1`, scoped by folder ACL to exactly the
 A4 folders. Nightly n8n job: SFTP pull → extract text → embed → upsert
 into `company_docs`, keyed by file path. The retrieval prompt
 distinguishes `WORKFLOW-` files (return steps verbatim) from everything
-else (answer and cite).
+else (answer and cite). Index the full file text, not just its folder
+README — the A11 proof of concept shows a folder-level or one-line
+summary misses real questions that full content gets right. The prompt
+must also refuse to answer past what the retrieved text literally
+contains — "not in what I have, ask HR/IT" beats a confident guess (see
+A11).
 
 **What never gets indexed:** comp, disciplinary, medical, and legal
 material — excluded at the file-permission level, the same way
@@ -261,3 +266,44 @@ free-for-all.
 | Anyone | Flag a workflow that's wrong, missing, or confusing — to their department owner, informally |
 | Department owner (HR / IT / Admin) | Write and edit any `WORKFLOW-` file in their own folder, on the template above |
 | ZGX build owner + HR lead | The only two who touch `_start-here.md` and `_routing-index.md` — small surface, kept deliberately narrow |
+
+## A11 — Proof of concept: are the descriptions enough?
+
+Couldn't reach the real office Synology from this session — no network
+path to the internal NAS, and no reason this session should hold
+`aiuser1`-style credentials. So this rebuilds 9 real files from A4 using
+the actual content already pulled from the current site (phone parking,
+backup setup, conference room, referral program, WFH, BuilderTrend
+access, fax), and tests retrieval at three levels of description depth
+against 13 realistic questions using TF-IDF keyword search as a
+lightweight stand-in for the pgvector embedding search the ZGX will
+actually run.
+
+| Depth indexed | Score | What it means |
+|---|---|---|
+| Folder-level library summary only | 10/13 | Looks fine only because there are just 3 folders to choose between here — real deployment has 8 folders and dozens of files, so this gets worse, not better, at real scale |
+| One-line-per-file description | 9/13 | Missed the referral program entirely on two different real phrasings — a one-liner with none of a caller's actual words has nothing to match against |
+| Full workflow file content | 11/13 | Best of the three, and the only one that got BuilderTrend clock-in and the fax question right on paraphrased wording |
+
+**Two failures worth designing around, not just noting:**
+
+- **Near-miss between related files** — "what software backs up my
+  files to the server" matched `REFERENCE-server-access` instead of
+  `WORKFLOW-backup-setup`, since both legitimately mention `jdbsrv`. Fix:
+  keep each file scoped to one job, and state the trigger phrase plainly
+  near the top rather than relying on the filename to disambiguate.
+- **A confident answer to a question it can't actually answer** — "how
+  many sick days do I get" scored a real match against the time-off
+  file, which points to Paylocity but doesn't contain a sick-day number.
+  A model that just answers from the top match will make one up. The
+  assistant has to check whether the retrieved text literally contains
+  the answer, and say "not in what I have — ask HR / check Paylocity"
+  when it doesn't.
+
+**One honest caveat:** this uses plain keyword-overlap search (TF-IDF),
+not the semantic embeddings the ZGX will actually run — a real embedding
+model should handle paraphrase somewhat better than these numbers show.
+The shape of the finding shouldn't change, though: a folder-level or
+one-line description is a routing aid, not a substitute for indexing the
+real file content, and the assistant needs an explicit "not found" path
+rather than always answering from its best-available match.
