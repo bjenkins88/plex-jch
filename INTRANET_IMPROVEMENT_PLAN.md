@@ -20,6 +20,13 @@ company that builds houses?* BuilderTrend access itself (getting an
 account, clocking in/out) is IT's job and stays in scope — using
 BuilderTrend once you're in it doesn't.
 
+**This line already exists on the real Synology** — the top level of
+`jdbsrv` is split into `01 Job-Related` and `02 Not-Job-Specific`. As a
+first cut, the restricted ingestion account (A6) simply never gets
+access to `01 Job-Related` at all. One real wrinkle: "not tied to one
+job" isn't quite the same test as "not construction process" — see the
+flagged folders in A4.
+
 ## A1 — Ask, not publish
 
 The current site already tries to do this — its homepage says "there
@@ -79,31 +86,42 @@ them as literal numbered steps, never a summary.
 
 ## A4 — The folder plan
 
-Same eight-section taxonomy as before, now with real files in it —
-reference and workflow content side by side, tagged, not split into
-different systems:
+Replaced with the real `02 Not-Job-Specific` tree from the actual
+Synology, not an invented taxonomy. Confirmed folders below; a few
+genuinely ambiguous ones are flagged separately, pending a scope call.
 
+**Confirmed in scope:**
 ```
-/Company/
-  01-New-Hire-Hub/
-  02-HR/
-    POLICY-team-member-handbook.pdf   (exported from the Google Doc)
-    WORKFLOW-request-time-off.md      (points to Paylocity)
-  03-IT/
-    WORKFLOW-phone-system.md          (Zoom Phone, parking a call, Polycom steps)
-    WORKFLOW-backup-setup.md          (Synology Drive client, Continuous Backup)
-    WORKFLOW-book-conference-room.md
-    REFERENCE-buildertrend-access.md
-    WORKFLOW-using-the-assistant.md   (exists elsewhere — import, don't rewrite)
-  04-Administrative/                  (logo files, signature line, brand assets)
-  05-Company-Procedures/
-    WORKFLOW-request-wfh.md
-    WORKFLOW-referral-program.md      (Jenkins Finder's Program)
-  06-Directory-Org-Chart/
-  07-Forms/
-  _routing-index.md                   ("if it's not here, it's in Paylocity / BuilderTrend / ...")
-  _start-here.md                      (the menu from A5)
+/02 Not-Job-Specific/
+  07 HR (Human Resources)/
+  08 IT/
+  03 Accounting Procedures/
+  09 Insurance - GL & Risk/
+  10 Client Forms & Books/
+  11 Interoffice Forms & Forms/
+  12 Management Reports/
+  99 Best Practices/        <- candidate home for existing WORKFLOW- content
+  _routing-index.md
+  _start-here.md
 ```
+
+**Pending a scope call:**
+```
+  01.1 Estimating & Purchasing/
+  01.2 Schedule Management/
+  02 Selections and Interior/
+  05 Designers/
+  06 Construction Management/
+  16 Renderings/
+  17 Project Managers/
+  15 Vendor Catalogues/
+  04 Marketing Shared/
+  14 Jenkins Standards/
+```
+"Not tied to one job" isn't the same test as "not construction
+process" — these sit under Not-Job-Specific but read like design/build
+workflow, the exact thing A0 says stays in BuilderTrend. Real call, not
+a default.
 
 ## A5 — Start Here: the workflow menu
 
@@ -129,7 +147,7 @@ owns room booking":
 **Note:** that last row needs its own workflow — assume nobody knows how
 to reach or use the ZGX/Open WebUI on their own. Instructions for this
 already exist elsewhere; this plan doesn't duplicate them, just flags
-that they need a home in `03-IT/` and a line in this menu once folded
+that they need a home in `08 IT/` and a line in this menu once folded
 in.
 
 One file, two homes: it's `_start-here.md` on the Synology (indexed like
