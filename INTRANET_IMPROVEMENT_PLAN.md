@@ -1,61 +1,41 @@
 # Where Do I Find It?
 
-An "ask layer" over the files that already exist, plus a small set of
-real **workflows** pulled out of the current Google Site — so a
-confused person has a place to start, and a specific person has a place
-to ask. Real documents stay on the office Synology, Paylocity stays the
-HR system of record, BuilderTrend stays the jobs system of record. The
-ZGX Nano's existing local AI stack answers "where do I find X" by
-indexing and pointing into them, reusing the same ingestion pattern
-already proven on the in-progress Phase 8 media-search pipeline.
+**Project 1 of 2.** The team intranet, scoped to one job: a starting
+place anyone can land on and find HR, IT, and administrative
+information — without needing to already know where to look. Design and
+construction procedures stay in BuilderTrend.
+
+> This used to include a plan to make the ZGX Nano's local AI answer
+> questions over the whole file server. That's now a separate, **paused**
+> project — see `ZGX_ASSISTANT_PROJECT.md` for where it left off and why.
 
 Rendered version with diagrams: https://claude.ai/code/artifact/98aadf3e-9cab-4b8a-9240-5a52a0f2cbd8
 
 ## A0 — The scope line
 
-Unchanged: everything on the job-and-trade side stays in BuilderTrend.
-Everything on the company-and-people side is what this system covers.
-Test: *does this describe how we build a house, or how we run the
-company that builds houses?* BuilderTrend access itself (getting an
-account, clocking in/out) is IT's job and stays in scope — using
-BuilderTrend once you're in it doesn't.
+Everything on the job-and-trade side stays in BuilderTrend. Everything
+on the company-and-people side is what this site covers. Test: *does
+this describe how we build a house, or how we run the company that
+builds houses?*
 
-**This line already exists on the real Synology** — the top level of
-`jdbsrv` is split into `01 Job-Related` and `02 Not-Job-Specific`. As a
-first cut, the restricted ingestion account (A6) simply never gets
-access to `01 Job-Related` at all. One real wrinkle: "not tied to one
-job" isn't quite the same test as "not construction process" — see the
-flagged folders in A4.
+**Stays in BuilderTrend:** job scheduling & phase sequencing, trade
+partner scopes of work, material selections & change orders, permitting,
+inspections, punch lists, warranty.
 
-## A1 — Ask, not publish
+**On the intranet:** IT, HR, and admin policy & procedure; new hire
+onboarding, forms, directory; "where is the file for..." / "who do I
+ask about..."
 
-The current site already tries to do this — its homepage says "there
-are several questions that this site attempts to answer," then lists
-them. That instinct was right; it just had to be maintained by hand,
-page by page, forever. Leave real files where they already live
-(Synology, Paylocity, BuilderTrend) and build a thin layer that knows
-where everything is and answers in plain language, re-reading the real
-folders on a schedule instead of holding a second copy of the truth.
+## A1 — Audit the existing site first
 
-The ZGX Nano already runs the pipeline this needs: pull files from the
-office Synology over a restricted account, extract and embed content,
-store it in pgvector, surface it through Open WebUI — proven on the
-in-progress Phase 8 media pipeline. Pointing it at documents is the same
-build, not a new one.
+Before writing anything new, inventory every page on the current site
+and mark each: keep / rewrite / merge / kill / move to BuilderTrend.
+Also check for: orphan pages, duplicates of content that already lives
+in BuilderTrend/Paylocity/the server, pages with no owner or
+last-updated date, broken navigation paths (count clicks from Home), and
+permissions on anything HR-sensitive.
 
-## A2 — Three tiers
-
-- **Source** (systems of record, untouched): office Synology (docs,
-  forms), Paylocity (HR self-service), BuilderTrend (jobs, field), plus
-  `_routing-index.md` and `_start-here.md`.
-- **Index** (nightly, via n8n): restricted SFTP pull → extract & embed
-  text → upsert into a `company_docs` pgvector table — same pattern
-  already running for Phase 8.
-- **Ask** (Open WebUI + the Google Site's homepage): answers a specific
-  question, walks a workflow step by step, or hands over the Start Here
-  menu when a question is too vague to match anything.
-
-## A3 — Policy vs. workflow: two kinds of content
+## A2 — Policy vs. workflow: two kinds of content
 
 The current site already mixes two very different things under one
 roof, and that's a real source of "where do I even start." Look at
@@ -77,251 +57,136 @@ work-from-home (supervisor pre-approval → checklist form), the Jenkins
 Finder's referral program (get contact info → send to Sales *before*
 they reach out → $1,000 gift card).
 
-This matters for the AI too: a reference fact is safe to retrieve and
-quote. A workflow is **not safe to paraphrase** — a model summarizing
-"backing up your hard drive" could quietly drop the Continuous Backup
-step. Workflow files get tagged as a distinct type (a `WORKFLOW-`
-filename prefix is enough) and the assistant is instructed to return
-them as literal numbered steps, never a summary.
+This isn't just a naming exercise — it changes how a page reads. A
+reference page can be short and dense. A workflow page needs numbered
+steps a person can follow without re-reading, and should say up front
+who to ask if a step doesn't work. Use one template for every workflow
+page (Trigger → Steps → Who to ask if stuck → Owner → Last updated) so
+people stop re-learning the layout every time.
 
-## A4 — The folder plan
+## A3 — The site plan
 
-Replaced with the real `02 Not-Job-Specific` tree from the actual
-Synology, not an invented taxonomy. Confirmed folders below; a few
-genuinely ambiguous ones are flagged separately, pending a scope call.
+Eight top-level sections, everything else nests under one of them:
 
-**Confirmed in scope:**
-```
-/02 Not-Job-Specific/
-  07 HR (Human Resources)/
-  08 IT/
-  03 Accounting Procedures/
-  09 Insurance - GL & Risk/
-  10 Client Forms & Books/
-  11 Interoffice Forms & Forms/
-  12 Management Reports/
-  99 Best Practices/        <- candidate home for existing WORKFLOW- content
-  _routing-index.md
-  _start-here.md
-```
+- **Home** — the Start Here menu (see A4)
+- **New Hire Hub** — pre-day-one, Day 1, Week 1, 30/60/90, who's who
+- **HR** — *Policy:* handbook, holidays, conduct · *Workflow:* request
+  time off (→ Paylocity), offboarding
+- **IT** — *Workflow:* phone system, backup setup, book conference room,
+  send a fax · *Reference:* BuilderTrend access, server access
+- **Administrative** — expenses, purchasing authority, vehicles, travel,
+  facilities, brand assets
+- **Company Procedures** — *Workflow:* request WFH, referral program
+- **Directory & Org Chart**
+- **Forms & Documents Library**
 
-**Pending a scope call:**
-```
-  01.1 Estimating & Purchasing/
-  01.2 Schedule Management/
-  02 Selections and Interior/
-  05 Designers/
-  06 Construction Management/
-  16 Renderings/
-  17 Project Managers/
-  15 Vendor Catalogues/
-  04 Marketing Shared/
-  14 Jenkins Standards/
-```
-"Not tied to one job" isn't the same test as "not construction
-process" — these sit under Not-Job-Specific but read like design/build
-workflow, the exact thing A0 says stays in BuilderTrend. Real call, not
-a default.
+Every page carries a footer: Owner / Last reviewed / Next review due. A
+page overdue for review gets flagged on Home's "needs attention" list,
+not silently left stale.
 
-## A5 — Start Here: the workflow menu
+## A4 — Start Here: the homepage menu
 
-The direct answer to "some people won't know where to start to ask
-questions." The homepage already half-built this — a short bulleted
-list of the questions the site answers. Formalize that instinct into a
-menu organized by real-world trigger, not by department, because a
-confused person knows "I need to book a room," not "which department
-owns room booking":
+The direct answer to "some people won't know where to start." The
+current homepage already half-built this — it literally says "there are
+several questions that this site attempts to answer," then lists them.
+Formalize that instinct into a menu organized by real-world trigger, not
+by department, because a confused person knows "I need to book a room,"
+not "which department owns room booking":
 
 | If this is you... | Go here |
 |---|---|
 | Starting a new job | New Hire Hub |
 | Requesting time off or sick time | Paylocity |
-| Need to work from home | Workflow: request-wfh |
-| Booking the conference room | Workflow: book-conference-room |
-| Something's wrong with my phone/computer | Workflow: phone-system / backup-setup |
-| Want to refer a friend | Workflow: referral-program |
-| Have a policy question | Ask the assistant, or open the Handbook |
-| **Don't know how to get to or use the assistant itself** | Workflow: using-the-assistant |
-| Anything else | Ask the assistant |
+| Need to work from home | Workflow: request WFH |
+| Booking the conference room | Workflow: book conference room |
+| Something's wrong with my phone/computer | Workflow: phone system / backup setup |
+| Want to refer a friend | Workflow: referral program |
+| Have a policy question | Open the Handbook, or ask HR |
+| Anything else | Ask HR (bjenkins@newhousebuilder.com) |
 
-**Note:** that last row needs its own workflow — assume nobody knows how
-to reach or use the ZGX/Open WebUI on their own. Instructions for this
-already exist elsewhere; this plan doesn't duplicate them, just flags
-that they need a home in `08 IT/` and a line in this menu once folded
-in.
+**One rule keeps this from becoming a second wiki:** it stays capped at
+~8 items. Adding a 9th means retiring or merging another — see A6.
 
-One file, two homes: it's `_start-here.md` on the Synology (indexed like
-everything else, so the assistant can open with it when a question is
-too vague to match), **and** it's the Google Site's homepage — kept, not
-retired, because it's already what everyone has bookmarked. The Google
-Site's whole remaining job becomes this one menu.
+## A5 — New hire path
 
-## A6 — How it actually answers
+- **Day one** — desk/login ready, buddy assigned, handbook
+  acknowledgment, and a walkthrough of the Start Here menu — three real
+  questions tried live: "where's the handbook," "how do I request time
+  off," "who's my IT contact."
+- **Week one** — required trainings marked complete on the New Hire Hub;
+  role-specific reading assigned by manager.
+- **30 / 90 days** — manager check-in, benefits enrollment reminder (→
+  Paylocity), access review, formal review closes the onboarding record.
 
-**Ingestion (reuse, don't rebuild):** restricted DSM account, same
-pattern as the existing `aiuser1`, scoped by folder ACL to exactly the
-A4 folders. Nightly n8n job: SFTP pull → extract text → embed → upsert
-into `company_docs`, keyed by file path. The retrieval prompt
-distinguishes `WORKFLOW-` files (return steps verbatim) from everything
-else (answer and cite). Index the full file text, not just its folder
-README — the A11 proof of concept shows a folder-level or one-line
-summary misses real questions that full content gets right. The prompt
-must also refuse to answer past what the retrieved text literally
-contains — "not in what I have, ask HR/IT" beats a confident guess (see
-A11).
+## A6 — Who maintains it — and how it stays evergreen
 
-**What never gets indexed:** comp, disciplinary, medical, and legal
-material — excluded at the file-permission level, the same way
-`aiuser1` can't see outside `photo/` and `video/` today. If HR wants
-that searchable later, it's a separate Open WebUI Knowledge collection
-gated by RBAC to HR only — a deliberate second build.
-
-## A7 — Who maintains it
-
-| Area | Owner | Job |
+| Section | Owner | Review cadence |
 |---|---|---|
-| HR / IT / Admin folders | HR lead · IT lead · admin manager | Keep files current; turn a process change into an updated `WORKFLOW` file, not a paragraph edit buried in a policy doc |
-| `_start-here.md` | ZGX build owner + HR lead | Keep the menu to ~8 items — it's a menu, not an index of everything |
-| `_routing-index.md` | ZGX build owner | Update when a system of record changes |
-| Index & sync job | ZGX build owner | Watch the nightly n8n run, same discipline as the Bills/media pipelines |
-| Query gaps | ZGX build owner + HR lead | Review monthly what people ask and don't get a good answer to |
+| HR | HR lead | Quarterly, or on any policy change |
+| IT | IT lead | Quarterly, or on any tool/vendor change |
+| Administrative | Office / admin manager | Quarterly |
+| New Hire Hub | HR lead + hiring manager | Every hire; formally every 2 quarters |
+| Home / Start Here menu | HR lead | One-in-one-out — never grows past ~8 items |
+| Structure & template | Intranet curator (you) | Approves new top-level pages |
 
-## A8 — Build schedule (Phase 8B)
+**Three things should trigger an update** — and only one of them is
+"someone remembered": (1) the system behind a page changes — a vendor
+swap, a new tool (this session's own Gusto → Paylocity correction is
+exactly that kind of drift); (2) someone flags it — a new hire hits a
+dead end and tells their department owner; (3) the scheduled quarterly
+review catches the rest.
+
+**Retiring a page:** unpublish, don't delete — Google Sites keeps
+version history as the safety net. Pull its link out of the Start Here
+menu and any other page that points to it in the same edit.
+
+## A7 — Platform call
+
+**Recommendation: stay on Google Sites for this rebuild.** The company
+is already on Google Workspace — Sites is free, integrates with Drive
+and Calendar, and the real problem right now isn't the platform, it's
+that the site has no structure, no owners, and no template. Fix those
+first.
+
+**Where Sites falls short:** no content approval workflow, no real
+version history on a page, coarse permissions (whole page/section, not
+field-level), search is weak past ~40–50 pages.
+
+**When to revisit this:** headcount pushes past roughly 40–50 people,
+you need sign-off workflows on policy changes, or search/findability
+complaints persist after A3–A5 are done — then look at Confluence,
+Notion, or SharePoint, not before.
+
+## A8 — Build schedule
 
 1. **Harvest what already exists** — pull the ~6 real workflows off the
    current site (phone/Zoom handoff, backup setup, conference room, WFH
-   checklist, referral program, BuilderTrend access) and rewrite each as
-   its own numbered `WORKFLOW-` file. Export the Team Member Handbook
-   off Google Docs onto the Synology as the canonical file. Fold in the
-   existing "how to reach and use the ZGX assistant" instructions as
-   `WORKFLOW-using-the-assistant.md` — that material already exists,
-   just needs to land here rather than being rewritten.
-2. **Organize the folders** — build the A4 tree on the office Synology,
-   assign owners, write each README.
-3. **Lock down the account** — new restricted DSM account, folder ACLs
-   limited to the A4 folders; verify by trying to browse outside them
-   and failing.
-4. **Adapt the Phase 8 pipeline** — same SFTP + pgvector shape, swap
-   image-captioning for text extraction, add the workflow-vs-reference
-   tagging from A3/A6.
-5. **Rebuild the homepage as Start Here** — replace the current
-   homepage's Q&A prose with the A5 menu; can ship independently of the
-   AI work.
-6. **Pilot, then open it up** — real questions from a few people, check
-   that workflow answers come back as full steps, then announce
-   company-wide.
+   checklist, referral program, BuilderTrend access) and rewrite each on
+   the A2 template. No new writing from scratch where content already
+   exists.
+2. **Foundation** — run the A1 audit, lock the A3 site plan, assign A6
+   owners.
+3. **Framing** — build the nav shell, stub every page from A3, set
+   section-level permissions (HR-sensitive pages restricted).
+4. **Rough-in** — write/migrate HR, IT, and Admin content into the
+   harvested pages; build the New Hire Hub.
+5. **Finish-out** — rebuild Home as the A4 Start Here menu, directory &
+   org chart, consistent labeling.
+6. **Walkthrough** — pilot with one real new hire or one volunteer per
+   department, run the A9 punch list, then announce company-wide.
 
-## A9 — Front door & punch list
+## A9 — Punch list before occupancy
 
-- **Don't know where to start** — Google Site homepage → the A5 Start
-  Here menu. No login, no typing a question, just pick your situation.
-- **Know exactly what to ask** — Open WebUI, at the office (kiosk or
-  shared screen) or at a desk via bookmark.
-- **Off-site / jobsite** — the existing WireGuard VPN (Phase 6) already
-  covers this.
-
-Punch list:
-- Every A4 folder has a README and a named owner
-- All 6 existing workflows are harvested into `WORKFLOW-` files, checked
+- Every top-level section has a named owner and a review date in its footer
+- All ~6 existing workflows are harvested onto the A2 template, checked
   against the original site content for dropped steps
-- The restricted account can reach only the A4 folders — tested, not assumed
-- Comp/disciplinary/medical/legal folders are unreachable by that account
-- The nightly sync runs clean for a full week before go-live
-- The assistant returns a workflow as its literal steps, not a
-  paraphrase — checked on at least 2 real workflow files
-- A real new hire finds an answer starting from the homepage menu *and*
-  by asking directly, without asking a person
-
-## A10 — Staying evergreen
-
-A workflow is evergreen only if changing it is easier than leaving it
-wrong.
-
-**Three things should trigger a change** — and only one of them is
-"someone remembered":
-
-1. **The system changes** — a vendor swap, a new tool, a new approval
-   chain. This conversation's own Paylocity correction is exactly the
-   kind of drift this has to catch on purpose, not by luck — a payroll
-   switch should trigger a workflow update as part of the rollout, not
-   an afterthought someone notices months later.
-2. **Someone flags it** — a query comes back wrong or empty (caught by
-   the A7 monthly query-gap review), or a person just tells their
-   department owner "this step is wrong now."
-3. **Scheduled review** — the A7 quarterly folder review catches the
-   slow drift nobody happened to notice.
-
-**The loop — no separate "publish" step:**
-
-1. Trigger noticed (any of the three above)
-2. Owner edits the file directly on the Synology, using the template
-   below — no CMS, no ticket, no approval queue for a routine update
-3. The nightly reindex (the same n8n job from A6) picks it up
-   automatically — the owner doesn't do anything extra to "publish" it
-4. Live everywhere — in the assistant within a day, and in
-   `_start-here.md` too if it's common enough to earn a menu line
-
-**Every `WORKFLOW-` file, same shape:**
-- **Trigger** — the real-world situation that sends someone here
-- **Steps** — numbered, in order, decisions called out explicitly
-- **Who to ask if stuck** — a name, not just "IT"
-- **Owner · Last updated** — same footer discipline as A7
-
-**Retiring a workflow:**
-- Move the file to `_archive/`, don't delete it — Synology's own Drive
-  versioning (already in use today) is the real safety net
-- An archived file is excluded from the index — it stops being retrieved
-- Scrub any pointer to it out of `_start-here.md` and
-  `_routing-index.md` in the same edit
-
-**One rule keeps Start Here from becoming the wiki again:** it stays
-capped at ~8 items. Adding a 9th means retiring or merging another —
-gatekept by the same two people who own the file (A7), not a
-free-for-all.
-
-| Who | Can do |
-|---|---|
-| Anyone | Flag a workflow that's wrong, missing, or confusing — to their department owner, informally |
-| Department owner (HR / IT / Admin) | Write and edit any `WORKFLOW-` file in their own folder, on the template above |
-| ZGX build owner + HR lead | The only two who touch `_start-here.md` and `_routing-index.md` — small surface, kept deliberately narrow |
-
-## A11 — Proof of concept: are the descriptions enough?
-
-Couldn't reach the real office Synology from this session — no network
-path to the internal NAS, and no reason this session should hold
-`aiuser1`-style credentials. So this rebuilds 9 real files from A4 using
-the actual content already pulled from the current site (phone parking,
-backup setup, conference room, referral program, WFH, BuilderTrend
-access, fax), and tests retrieval at three levels of description depth
-against 13 realistic questions using TF-IDF keyword search as a
-lightweight stand-in for the pgvector embedding search the ZGX will
-actually run.
-
-| Depth indexed | Score | What it means |
-|---|---|---|
-| Folder-level library summary only | 10/13 | Looks fine only because there are just 3 folders to choose between here — real deployment has 8 folders and dozens of files, so this gets worse, not better, at real scale |
-| One-line-per-file description | 9/13 | Missed the referral program entirely on two different real phrasings — a one-liner with none of a caller's actual words has nothing to match against |
-| Full workflow file content | 11/13 | Best of the three, and the only one that got BuilderTrend clock-in and the fax question right on paraphrased wording |
-
-**Two failures worth designing around, not just noting:**
-
-- **Near-miss between related files** — "what software backs up my
-  files to the server" matched `REFERENCE-server-access` instead of
-  `WORKFLOW-backup-setup`, since both legitimately mention `jdbsrv`. Fix:
-  keep each file scoped to one job, and state the trigger phrase plainly
-  near the top rather than relying on the filename to disambiguate.
-- **A confident answer to a question it can't actually answer** — "how
-  many sick days do I get" scored a real match against the time-off
-  file, which points to Paylocity but doesn't contain a sick-day number.
-  A model that just answers from the top match will make one up. The
-  assistant has to check whether the retrieved text literally contains
-  the answer, and say "not in what I have — ask HR / check Paylocity"
-  when it doesn't.
-
-**One honest caveat:** this uses plain keyword-overlap search (TF-IDF),
-not the semantic embeddings the ZGX will actually run — a real embedding
-model should handle paraphrase somewhat better than these numbers show.
-The shape of the finding shouldn't change, though: a folder-level or
-one-line description is a routing aid, not a substitute for indexing the
-real file content, and the assistant needs an explicit "not found" path
-rather than always answering from its best-available match.
+- Nothing on the intranet duplicates a BuilderTrend SOP — check the A0
+  boundary again
+- A brand-new hire can complete IT setup and week-one HR tasks using
+  only the New Hire Hub and Start Here menu, without asking a person
+- Every nav item resolves in two clicks or fewer from Home
+- HR-sensitive pages (comp, disciplinary, medical) are
+  permission-restricted, not just unlinked
+- Old/duplicate pages from the A1 audit are unpublished, not left live
+  alongside the new structure
+- Home page has a visible "needs attention" list for overdue reviews
