@@ -3,12 +3,13 @@
 **Project 2 of 2.** A local-AI "where do I find X" layer over the office
 file server, built on the ZGX Nano's existing infrastructure.
 
-**Status: ON HOLD as of Sept 14, 2026.** In your own words: "I haven't
-figured out how to get the other piece of this to work because we have
-so many folders on the server, and they're such a mess that it would be
-very hard for AI to look at it and figure out how to organize it for
-us." The blocker is the folder structure, not the AI — see P5 for what
-that means for resuming.
+**Status: ON HOLD as of Sept 14, 2026,** with a promising unblock
+identified Sept 15 — see P6. In your own words: "I haven't figured out
+how to get the other piece of this to work because we have so many
+folders on the server, and they're such a mess that it would be very
+hard for AI to look at it and figure out how to organize it for us." The
+blocker is the folder structure, not the AI — see P5/P6 for what that
+means for resuming.
 
 Rendered version with diagrams: https://claude.ai/code/artifact/d2da5afc-f715-4045-8d9b-c60cb6ad1df6
 
@@ -131,13 +132,86 @@ indexed, not just a label describing the folder.
   each desk, and the existing WireGuard VPN (Phase 6) for off-site/
   jobsite access
 
+## P6 — The long-term fix: automation as the only writer
+
+**The core idea (Sept 15):** stop trying to clean up a moving target.
+People dragging files onto the share by hand is what made it messy in
+the first place, and will keep making it messy no matter how good the
+index gets. The durable fix is upstream of indexing: **make an
+automation the only way a file lands on the server**, so every file
+already has a consistent name and a correct project folder the moment it
+exists. Retrieval gets reliable because *ingestion* got reliable — not
+because the AI got better at guessing.
+
+**Is there a free AI tool that already does this?** Not quite, and it's
+worth knowing why before reaching for one:
+
+- **[LlamaFS](https://github.com/iyaja/llama-fs)** is the closest match
+  in spirit — free, open-source, uses an LLM to rename and refile
+  documents by content, and has an "incognito mode" that routes through
+  Ollama instead of a cloud API, so it could run fully local against the
+  ZGX's existing Ollama server. But it's a small, hackathon-grade
+  project, not something with a track record at this scale, and its
+  image/audio components (Moondream, Whisper) have unverified ARM64
+  support on GB10-class hardware — the same "official containers just
+  won't start on ARM64+CUDA" problem that's already bitten other tools
+  on this exact chip family. More importantly: it invents its own
+  organizing scheme from a batch of files. It has no way to know your
+  177 real BuilderTrend job names and will not reliably reuse the exact
+  same project name twice on its own.
+- **[Paperless-ngx](https://www.layer3labs.io/guides/open-source-ai-document-management-software),
+  Docspell, Mayan EDMS, Papermerge** are mature, genuinely free,
+  well-supported self-hosted document archives with OCR and
+  auto-tagging. They're built for a *scanned-paperwork inbox* (invoices,
+  letters, insurance forms) with their own tag/correspondent database —
+  a strong fit for the Accounting / Insurance / Client Forms slice of
+  `02 Not-Job-Specific` specifically, but not a general gatekeeper for
+  the whole project-file server or its job-name conventions.
+
+**The actual recommendation: extend what's already running, don't bolt
+on a new product.** The hard part was never "can an LLM read a
+document" — it's "will it always produce the exact same project name."
+You already have the answer to that sitting in Postgres: the `jobs`
+table in `jdb_costs` holds 177 real, canonical project names pulled
+straight from BuilderTrend (Phase 3/7). A generic file organizer has to
+guess a name from the document's content; your pipeline can look the
+real name up and refuse to invent one when it isn't sure.
+
+Concretely, this is Phase 8's read pipeline, extended to also write:
+
+1. **One locked inbox** (a single upload folder, an email-to-folder
+   address, or a simple form) becomes the only writable path onto the
+   server. Normal write access to the real project/department folders
+   gets turned off for people.
+2. **n8n watches the inbox** and sends each new file to Ollama for
+   classification: document type, and any project or job it mentions.
+3. **The mentioned project gets matched against the real `jobs` table**
+   (fuzzy/trigram match), not trusted from the model's own phrasing. No
+   confident match → routed to a human review queue instead of a guess.
+4. **A fixed naming template** (e.g.
+   `<JobCode>_<DocType>_<YYYY-MM-DD>_<slug>.pdf`) gets applied the same
+   way every time — a template, not the model's mood that day.
+5. **The file is written via SFTP** to the correct destination, and
+   every decision is logged so a human can undo one in seconds.
+
+**The honest catch — this is a process change, not just a script.** It
+only works if people actually stop dragging files straight onto the
+share, which means locking down write permissions and getting real
+buy-in, not just standing up an n8n workflow. That adoption piece is
+probably the harder of the two problems.
+
+**It doesn't retroactively fix the existing mess**, either. What it
+does give you is a way to freeze the bleeding immediately — every new
+file from today forward is named and filed correctly — while the
+`01 Job-Related` backlog gets cleaned up separately, on a slower
+timeline, possibly semi-automated later using the newly-consistent
+files as good examples of what "correct" looks like.
+
 ## P5 — Resuming this: start here
 
-1. **Clean up the server first.** This is the actual blocker, not a
-   technical one — a folder pass (merge duplicates, kill dead folders,
-   retire old naming conventions) before anything gets indexed. AI can
-   help organize once the folders are legible to a human; it's a poor
-   tool for untangling them from scratch.
+1. **Stand up the write-gate from P6 first.** It doesn't require the
+   existing mess to be cleaned up before it can start, and every day it
+   runs is one less day of new mess to eventually deal with.
 2. **Make the folder-by-folder call** from P2's "not yet decided" list —
    in scope for the assistant, or treated like BuilderTrend SOPs (out of
    scope).
@@ -145,6 +219,9 @@ indexed, not just a label describing the folder.
    08 IT, 99 Best Practices are good candidates) and re-run the P3
    proof-of-concept against real content instead of reconstructed
    samples.
-4. **Then pick the build schedule back up:** lock down the restricted
-   DSM account, adapt the Phase 8 ingestion pipeline for text instead of
-   images, wire it into Open WebUI.
+4. **Then pick the read-side build schedule back up:** lock down the
+   restricted DSM account, adapt the Phase 8 ingestion pipeline for text
+   instead of images, wire it into Open WebUI.
+5. **Deal with the `01 Job-Related` backlog separately**, on its own
+   timeline — a manual/semi-automated cleanup pass, not a blocker to
+   starting 1–4.
