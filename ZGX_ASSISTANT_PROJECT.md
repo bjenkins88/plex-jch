@@ -1,15 +1,17 @@
-# ZGX Ask-Layer — Paused
+# ZGX Ask-Layer — Phase 1 Scoped
 
 **Project 2 of 2.** A local-AI "where do I find X" layer over the office
 file server, built on the ZGX Nano's existing infrastructure.
 
-**Status: ON HOLD as of Sept 14, 2026,** with a promising unblock
-identified Sept 15 — see P6. In your own words: "I haven't figured out
-how to get the other piece of this to work because we have so many
-folders on the server, and they're such a mess that it would be very
-hard for AI to look at it and figure out how to organize it for us." The
-blocker is the folder structure, not the AI — see P5/P6 for what that
-means for resuming.
+**Status: Phase 1 defined Sept 22, 2026 — ready to build.** Paused Sept
+14 because the server is too messy for full indexing; unblocked Sept 15
+with the write-gate idea (P6); scoped down Sept 22 into something much
+smaller and more achievable first — see P7. In your own words, on why
+the original plan stalled: "I haven't figured out how to get the other
+piece of this to work because we have so many folders on the server,
+and they're such a mess that it would be very hard for AI to look at it
+and figure out how to organize it for us." P7 sidesteps that blocker
+rather than solving it head-on.
 
 Rendered version with diagrams: https://claude.ai/code/artifact/d2da5afc-f715-4045-8d9b-c60cb6ad1df6
 
@@ -207,21 +209,107 @@ file from today forward is named and filed correctly — while the
 timeline, possibly semi-automated later using the newly-consistent
 files as good examples of what "correct" looks like.
 
+## P7 — Phase 1, scoped down: Find It / File It
+
+**The idea (Sept 22):** instead of the full content-indexing plan (P1–P4)
+or the enforced write-gate (P6), ship something much smaller first — one
+tool, two questions, both answered by Llama through Ollama, right there
+in Open WebUI. No server lockdown. No full-server cleanup required
+first. This becomes the real Phase 1; P6 becomes an optional Phase 2 for
+later, once this one has earned trust.
+
+**On "teaching a llama" — what that actually means here:** not
+fine-tuning. Fine-tuning is already Phase 10 on your own roadmap
+(~18 months out) and needs a pile of labeled examples that don't exist
+yet. What this needs instead is **prompting + lookup** — giving the
+model the right context at question time (the real job list, the folder
+categories, a few examples), not training it on anything. Faster to
+build, costs nothing extra, and more reliable for a structured task like
+this than fine-tuning would be at this stage.
+
+**Question 1 — "Where could I find this file?"**
+A natural-language search over a lightweight index of *file paths and
+folder names* — not full document content. This is a directory crawl,
+not an OCR/content pipeline, which is why it's achievable without first
+solving the P2/P5 mess: it indexes what's *called*, not what's *inside*.
+Llama does semantic matching over that path/filename text (plus folder
+READMEs, where they exist), and **the answer includes a clickable link
+straight to the file's folder**, not just a typed-out path — nobody
+should have to hand-copy a path into File Station. Two ways to build the
+link, in order of how much they're worth verifying before committing to
+one:
+- **An `smb://jdbsrv/<path>` link** — opens directly in Finder or
+  Explorer on any machine with the share mounted. No DSM API involved,
+  works the same way the "Jenkins Server" link already does today, and
+  is the lower-effort, more reliable default for Phase 1.
+- **A Synology File Station deep link** — nicer (opens in the browser,
+  works for someone without the share mounted), but the exact URL
+  scheme needs to be confirmed against your specific DSM version before
+  relying on it — worth a quick spike, not an assumption.
+
+**Question 2 — "Where should this file go?"**
+A person describes the file (or uploads it); Llama classifies the
+document type and pulls out any project/job it mentions; that name gets
+matched against the real `jobs` table in `jdb_costs` (177 real
+BuilderTrend names) instead of invented; the tool proposes a destination
+folder and a consistently-formatted filename and **asks: "Would you like
+me to place it there?"** On yes, the tool performs the write itself over
+SFTP and confirms it's done — no manual drag-and-drop, no chance of a
+typo'd folder name. This is confirm-then-execute, not advisory-only: it
+mirrors the human-approval-before-any-write pattern you already built
+and trust for the BuilderTrend push-back integration (Phase 3) — same
+shape, applied to file placement instead of BuilderTrend data.
+
+**What confirm-then-execute changes about the write account:** it now
+needs real write access, which is a bigger deal than the read-only
+`aiuser1` pattern used everywhere else in this project. Scope it tightly:
+- **Create-only** — never grants delete or overwrite, so a bad match
+  can't destroy or silently replace an existing file
+- **Limited to the confirmed-in-scope destination folders** from P2,
+  the same boundary already used for reads
+- **Every placement logged** (source file, matched job, destination,
+  timestamp) so a wrong match is a one-click undo, not a cleanup project
+
+**Reuses what's already running:** same shape as the Phase 7 Vanna
+cost-query tool — a small API Llama calls, surfaced as an Open WebUI
+Tool — plus one new lightweight piece: a path crawler (list every file
+path in the confirmed-in-scope folders from P2, store path + folder text
+in a small table). Substantially smaller than the original P1–P4
+content-pipeline build.
+
+**Two honest expectations, set now:**
+- "Find it" will work noticeably better in the confirmed-clean folders
+  (07 HR, 08 IT, 99 Best Practices) than in the messy `01 Job-Related`
+  archive — a path-only index can search bad naming, it can't fix it.
+- "File it" is the stronger half out of the gate, precisely because it's
+  anchored to a real, clean list of job names rather than needing the
+  messy folders to already make sense.
+
+**The shape this gives the whole project:** because Phase 1 already
+executes writes (on a per-file human "yes"), it's closer to P6's goal
+than originally scoped — what P6 adds on top, as an optional later
+phase, isn't automated writing itself (Phase 1 already does that), it's
+**removing the manual alternative**: locking down direct write access so
+the tool becomes the *only* path, once its suggestions have earned
+enough trust that the per-file confirmation starts to feel redundant.
+Phase 3, also optional, layers real content-level indexing (the original
+P1–P4 plan) onto whichever folders turn out to be worth the investment.
+
 ## P5 — Resuming this: start here
 
-1. **Stand up the write-gate from P6 first.** It doesn't require the
-   existing mess to be cleaned up before it can start, and every day it
-   runs is one less day of new mess to eventually deal with.
+1. **Build the P7 Phase 1 tool.** Doesn't require the existing mess
+   cleaned up, doesn't require a permissions change, and starts
+   producing consistently-named new files immediately.
 2. **Make the folder-by-folder call** from P2's "not yet decided" list —
-   in scope for the assistant, or treated like BuilderTrend SOPs (out of
-   scope).
-3. **Pull a handful of real files** from 2–3 confirmed folders (07 HR,
-   08 IT, 99 Best Practices are good candidates) and re-run the P3
-   proof-of-concept against real content instead of reconstructed
-   samples.
-4. **Then pick the read-side build schedule back up:** lock down the
-   restricted DSM account, adapt the Phase 8 ingestion pipeline for text
-   instead of images, wire it into Open WebUI.
-5. **Deal with the `01 Job-Related` backlog separately**, on its own
-   timeline — a manual/semi-automated cleanup pass, not a blocker to
-   starting 1–4.
+   in scope for the tool, or treated like BuilderTrend SOPs (out of
+   scope) — needed either way, since P7's "find it" side has to know
+   what it's allowed to search.
+3. **Once P7 has run for a while, decide whether to tighten it into
+   P6's enforced write-gate**, using real usage as the evidence rather
+   than guessing upfront whether people will actually follow a
+   suggestion.
+4. **Content-level indexing (the original P1–P4 plan) is now optional,
+   not required** — only worth doing for folders where path/filename
+   search (P7) genuinely isn't cutting it.
+5. **The `01 Job-Related` backlog stays a separate, later cleanup**, on
+   its own timeline, not a blocker to any of the above.
