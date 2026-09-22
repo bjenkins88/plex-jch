@@ -295,6 +295,74 @@ enough trust that the per-file confirmation starts to feel redundant.
 Phase 3, also optional, layers real content-level indexing (the original
 P1–P4 plan) onto whichever folders turn out to be worth the investment.
 
+## P8 — Documenting the filing logic, so Llama can follow it
+
+**Format matters more than content here.** An LLM follows explicit,
+structured rules far more reliably than prose describing a filing
+philosophy — same lesson as A2 in the sibling intranet project (policy
+vs. workflow content reads differently), applied to rules instead of
+procedures.
+
+**One file: `_filing-rules.md`.** Same naming convention as
+`_routing-index.md` and `_start-here.md`, but different in one important
+way: it gets **injected directly into every "File It" prompt**, not
+retrieved by search. Everything else in this project (WORKFLOW-,
+REFERENCE- files) is found by semantic search when relevant — this
+document is foundational instruction, not something to search *among*.
+If retrieval happens to miss it on one call, Llama files something with
+no rules at all. At a realistic size (15–20 categories), it comfortably
+fits in every call's context, so there's no reason to risk that.
+
+**One entry per category, same shape every time:**
+```
+### 07 HR (Human Resources)
+
+What belongs here: personnel records, benefits paperwork, policy
+documents that apply company-wide, not to one job.
+
+Examples:
+- Employee handbook, W-4s, benefits enrollment forms
+- Company-wide holiday/PTO policy updates
+
+Not this — see instead: a certificate of insurance naming a specific
+employee goes in Client Forms & Books if it's for a client-facing job,
+not here.
+```
+
+**Four things worth doing deliberately:**
+1. **A fixed, enumerated category list — never free text.** Same
+   principle as the `jobs` table lookup: the category names and real
+   folder paths must be the exact same list every call, or "consistent
+   filing" stops meaning anything.
+2. **Write the disambiguation notes for pairs you already know are
+   confusable, not just the clean cases.** The highest-leverage section.
+   P3's proof-of-concept found real near-miss failures between related
+   content sharing vocabulary (a backup workflow vs. a server-access
+   reference) — the same thing will happen between real folders like
+   Insurance vs. Client Forms, or HR vs. Interoffice Forms. Every
+   category needs at least a placeholder "not this — see instead" line.
+3. **State the fallback explicitly: no confident match means ask, don't
+   guess.** Mirrors P7's confirm-then-execute flow, but needs to live in
+   the rules doc as a written rule too, not an assumption.
+4. **Keep a running table of real examples as a second section.** Every
+   real filename-to-destination pair is both a few-shot example (models
+   pattern-match from concrete cases far better than from abstract rules
+   alone) and a regression test you can rerun after any edit to the
+   rules, to catch a change that broke something that used to work.
+
+**How it stays accurate:** log every time someone overrides Llama's
+suggested destination — that override is a free, real signal a rule is
+missing or ambiguous. Review overrides on the same cadence as the
+monthly query-gap review already used elsewhere in this project, and
+turn recurring ones into a new disambiguation note or example row —
+same evergreen discipline as the rest of the project, pointed at filing
+decisions instead of workflow content.
+
+**What's still yours to fill in:** the actual "what belongs here" text
+per category needs real business judgment, not a guess from outside the
+company — this document only specifies the template and the discipline
+around it.
+
 ## P5 — Resuming this: start here
 
 1. **Build the P7 Phase 1 tool.** Doesn't require the existing mess
@@ -304,12 +372,15 @@ P1–P4 plan) onto whichever folders turn out to be worth the investment.
    in scope for the tool, or treated like BuilderTrend SOPs (out of
    scope) — needed either way, since P7's "find it" side has to know
    what it's allowed to search.
-3. **Once P7 has run for a while, decide whether to tighten it into
+3. **Write `_filing-rules.md`** (P8) for the confirmed-in-scope
+   categories, including disambiguation notes for the pairs most likely
+   to be confused.
+4. **Once P7 has run for a while, decide whether to tighten it into
    P6's enforced write-gate**, using real usage as the evidence rather
    than guessing upfront whether people will actually follow a
    suggestion.
-4. **Content-level indexing (the original P1–P4 plan) is now optional,
+5. **Content-level indexing (the original P1–P4 plan) is now optional,
    not required** — only worth doing for folders where path/filename
    search (P7) genuinely isn't cutting it.
-5. **The `01 Job-Related` backlog stays a separate, later cleanup**, on
+6. **The `01 Job-Related` backlog stays a separate, later cleanup**, on
    its own timeline, not a blocker to any of the above.
