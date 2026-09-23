@@ -3,7 +3,7 @@
 **Project 2 of 2.** A local-AI "where do I find X" layer over the office
 file server, built on the ZGX Nano's existing infrastructure.
 
-**Status: Phase 1 defined Sept 22, 2026 — ready to build.** Paused Sept
+**Status: Phase 1 built and working, Sept 23, 2026.** Paused Sept
 14 because the server is too messy for full indexing; unblocked Sept 15
 with the write-gate idea (P6); scoped down Sept 22 into something much
 smaller and more achievable first — see P7. In your own words, on why
@@ -11,7 +11,9 @@ the original plan stalled: "I haven't figured out how to get the other
 piece of this to work because we have so many folders on the server,
 and they're such a mess that it would be very hard for AI to look at it
 and figure out how to organize it for us." P7 sidesteps that blocker
-rather than solving it head-on.
+rather than solving it head-on. **Built end-to-end the very next day —
+see P9 for the full build log, real bugs found via live testing, and
+what's still open.**
 
 Rendered version with diagrams: https://claude.ai/code/artifact/d2da5afc-f715-4045-8d9b-c60cb6ad1df6
 
@@ -440,3 +442,187 @@ changes the shape of P7/P8 slightly:
    search (P7) genuinely isn't cutting it.
 6. **The `01 Job-Related` backlog stays a separate, later cleanup**, on
    its own timeline, not a blocker to any of the above.
+
+## P9 — Sept 23, 2026: Phase 1 built end-to-end, live-tested, deployed
+
+Built on-site, physically on the office LAN. Both Find It and File It are
+live, tested against the real server, and running as persistent systemd
+services on the ZGX. This section is the build log — what shipped, the
+real bugs live testing found (per Component 2 vs File It vs the tool
+integration, matching the pattern of every other phase in this project:
+report a wrong answer, dig for the real cause, fix it, verify against
+the real service), and what's still open.
+
+### Component 1 — job mapping: loaded
+
+`job_folder_xref.csv` (142 rows) loaded into a new `server_folder_map`
+table in `jdb_costs` (Postgres). The 86 high-confidence single-job
+matches were also mirrored into the existing `project_aliases` table
+(`alias_type='server_folder'`), so Cost Data/Media Search cross-referencing
+can use them immediately. Medium/low-confidence rows are loaded but not
+auto-aliased — still need a human look before anything trusts them.
+
+### Component 2 — Find It: built, tested, running
+
+- New DSM account `aiuser2` (read-only, SFTP-only via the Applications
+  tab, scoped to the confirmed-in-scope folders, explicitly excluding
+  `07 HR` and `09 Accounting`) — see "Real bugs" below for what it took
+  to actually get this account working.
+- `path_crawler.py`: SFTP walk of the 5 confirmed-in-scope roots
+  (`01 Job-Related`, `02 Not-Job-Specific` minus HR, `04 Marketing
+  Shared`, `photo`, `photo_1`) into a new `file_index` table.
+  **347,709 files indexed.** Scheduled nightly at 2am via a new n8n
+  workflow (`JDB Find It - Nightly Path Crawler`, SSH node, same
+  import-a-JSON-file pattern as the existing weekly report workflow).
+- `find_it_app.py`: a Flask API (port 8086, `find-it.service`) that
+  loads `_filing-rules.md` in full on every call, classifies
+  job-specific vs. department vs. ambiguous (asks rather than guesses
+  when unclear — a hard requirement, not just a nice-to-have), does a
+  `pg_trgm` similarity search over `file_index`, and has Ollama pick the
+  best match or the closest parent folder as a fallback — always citing
+  the policy reasoning, never a bare link.
+- Hard-coded (not left to the model) restricted-folder guard: even
+  though `file_index` never contains HR/Accounting rows at all, the
+  fallback step reasons over folder *names* in the rules text and could
+  still name one — caught and blocked in code.
+- A "known redirects" mechanism for things that aren't on the file
+  server at all (e.g. the employee handbook actually lives on the team
+  intranet site) — implemented as a deterministic keyword match parsed
+  straight out of `_filing-rules.md`, not an LLM judgment call, after
+  the LLM version missed the exact query it was built for.
+- Wired into Open WebUI as a Tool, then merged into a single combined
+  Tool alongside File It per Bethany's request (a user might want to
+  both look something up and file something in the same conversation).
+
+### Component 3 — File It: built, tested, running
+
+- New DSM account `aiuser3` (read/write on the confirmed-in-scope
+  folders, explicitly no access to `07 HR`/`09 Accounting`/
+  `Accounting-Backup-ONLY` — Component 4's DSM-level hard boundary).
+- `file_it_app.py`: a Flask API (port 8087, `file-it.service`) with two
+  endpoints matching the propose-then-confirm design:
+  - `GET /propose` — classify, match the job (via `server_folder_map`,
+    never inventing one), check for HR/Accounting-flavored content and
+    refuse with named contacts rather than silently misfiling it, find
+    the best real *existing* subfolder via `file_index` (not just the
+    bare category root), and return a destination + filename + a
+    confirm question.
+  - `POST /place` — the actual SFTP write, over `aiuser3`. Checks for an
+    existing file with the same name; on a confirmed replace, archives
+    the old one into `_archive/` (renamed with a timestamp) rather than
+    overwriting, then writes the new file. Every placement logged to a
+    new `placements_log` table (source, matched job, destination,
+    timestamp, whether it was a replacement).
+- `_archive/` retention: a 90-day auto-purge is the agreed design
+  (delete-scoped-to-`_archive/`-only permission, `placements_log` keeps
+  the permanent record after the bytes are gone) — **documented in
+  `_filing-rules.md`, not yet built as a running job.**
+- Filenames use the real original filename (slugified) plus the
+  resolved job code and date — deliberately *not* an LLM-invented
+  document-type label or a slug of the free-text description, after
+  live testing showed both were unreliable (see below).
+
+### Real bugs live testing found (same discipline as every other phase — dig, don't reassure)
+
+1. **DSM SFTP subsystem refused both new accounts with `EOF during
+   negotiation`** even though SSH auth succeeded and every permission
+   setting (Applications tab, folder ACLs, group permissions) looked
+   identical to the working `aiuser1`. Root cause, found only after
+   checking `/etc/passwd` and the home directories directly: DSM's
+   forced-password-change-at-first-login flag blocks the SFTP subsystem
+   at the DSM layer even though OS-level password auth doesn't care
+   about it. Fixed by actually logging in once through DSM's own UI.
+2. **Open WebUI's built-in tools kept winning over the custom Tool.**
+   With "File Context" (native RAG-over-attachments) on, attached files
+   never reached the Tool at all. With it off, the model reached for
+   built-in `ask_user`, then `list_memory_paths`, then
+   `search_knowledge_files` (the last one hallucinated as raw text, not
+   even a real call) before ever calling `file_document`. Root cause,
+   found only after all of that: **the custom tool was never enabled
+   for the new "JDB Assistant" model preset at all** — a brand-new
+   model starts with its own empty Tools selection, it doesn't inherit
+   from whatever model you'd enabled it on before. Once enabled, it
+   worked immediately. Disabling the unrelated built-in tool categories
+   (Ask User, Memory, Notes, Knowledge Base, etc.) for this model was
+   still worth doing afterward, so nothing else competes for the same
+   intent going forward.
+3. **The model invented a fake job name ("Become Legendary") and later
+   a fake document-type label ("handbook" for an interior design
+   document)** when constructing the tool's own `description` argument
+   or when Ollama classified `doc_type` server-side. Neither was
+   grounded in anything the user actually said. Fixed two ways: the
+   tool's docstring now explicitly forbids inventing job/project names
+   or details not stated, and the actual filename template was changed
+   to use the real, human-chosen original filename instead of an
+   LLM-generated label — removing the specific piece that kept getting
+   hallucinated, rather than just asking the model more firmly not to.
+4. **A file got placed on the server without the user ever seeing or
+   answering "would you like me to place it there?"** — after the user
+   answered an unrelated clarifying question ("department wide"), the
+   calling model set `confirmed=True` on its own initiative and the
+   write executed. A boolean the model sets by its own judgment isn't a
+   strong enough gate for something that actually writes to disk. Fixed
+   by replacing the boolean with a `user_latest_message` string
+   parameter and a **code-level** affirmative-language check (not an
+   LLM judgment call) — the write only happens if the user's own literal
+   words contain real affirmative language. Also collapsed what was a
+   two-round confirm-then-confirm-replace flow into one: `/propose` now
+   checks for a same-name collision live and discloses it up front in
+   the single confirm question, so one verified "yes" covers the whole
+   operation.
+5. **A real document (`Interior Analysis.docx`, Interior Design
+   department content) got proposed for `11 Interoffice Forms &
+   Procedures` instead of the correct `02 Selections and Interiors`,**
+   which already has a real `Interiors/INTERIOR ANALYSIS` subfolder for
+   exactly this. Two compounding causes: the model invented a
+   plausible-sounding "Travis County"-style subfolder on its own
+   initiative in a *different* case rather than only returning the bare
+   category (fixed by tightening the prompt to forbid it - subfolder
+   selection is a code-level job now, via `file_index`), and separately,
+   real folder names on the server sometimes have irregular double/
+   triple spaces that don't match `_filing-rules.md`'s clean documented
+   names, which silently broke the subfolder-matching SQL's prefix match
+   (fixed by normalizing whitespace on both sides of the comparison).
+   `_filing-rules.md`'s Selections and Interiors entry was also
+   strengthened with this real example and a disambiguation note.
+6. **A firewall gap, twice** — Docker containers (n8n, Open WebUI)
+   reaching the host's own LAN IP for SSH (port 22) and the two new
+   Flask services (8086, 8087) got silently dropped by `ufw`, same
+   underlying pattern as the already-documented Ollama/port-11434
+   regression from August: a "LAN only" rule doesn't automatically cover
+   Docker's bridge subnet (`172.17.0.0/16`) as a source. Fixed by adding
+   explicit `ufw allow from 172.17.0.0/16` rules for each port as the
+   need came up.
+
+### Also done this session
+
+- **User Guide updated** (`JDB_AI_Assistant_User_Guide.md`/`.docx`,
+  local copies now kept in `ai-for-jdb/` alongside the onboarding/admin
+  guides) — added a "why we built this" opening, a Media Search section
+  (was still missing despite being an open item since Sep 15), and a
+  Find It/File It section, plus an updated decision-guide table.
+  **Still needs to be pasted into the actual Google Doc** — the
+  available Drive connector is tied to a personal Gmail account, not
+  `bjenkins@newhousebuilder.com`, so it can read the shared doc but
+  can't write to it.
+- **Security note, unrelated to this build, flagged for later:** the
+  DSM's Log Center showed continuous SSH brute-force attempts (generic
+  bot usernames like `root`/`pi`/`ubuntu`, multiple per minute) against
+  whatever port is internet-exposed for DSM SSH — been happening about
+  a week per Bethany. Nothing indicates a successful breach, but worth
+  addressing (fail2ban / IP allowlisting / key-only auth) once Phase 1
+  work settles.
+
+### Open items, going into next session
+
+1. Build the `_archive/` 90-day retention job (design is written,
+   nightly job itself isn't running yet).
+2. Resolve the remaining medium/low-confidence rows in
+   `server_folder_map` (Component 1) — still not auto-aliased.
+3. Paste the updated User Guide content into the real Google Doc.
+4. Medium/low-confidence job-folder rows aside, everything else in P7's
+   original scope (subfolder matching, restricted-content handling,
+   confirm-then-execute, replace/archive) is done and live.
+5. `20 Inactive Projects`, drone-footage summaries, BuilderTrend sync
+   (Component 5) — all still explicitly deferred, not forgotten, same
+   as before.
