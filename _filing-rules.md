@@ -20,6 +20,18 @@ stop, regardless of which department produced it.
 
 ---
 
+## Known redirects — not on the file server at all (confirmed Sep 23)
+
+A small number of things people ask "where do I find X" about live
+somewhere other than `jdbsrv` entirely. Find It must answer with the real
+location below, not search or guess a server folder for these.
+
+| Asked about | Real location |
+|---|---|
+| Employee handbook, company policies | The team intranet site's Company Policies page: `https://sites.google.com/newhousebuilder.com/team/company-policies?authuser=1` — not a file on jdbsrv. |
+
+---
+
 ## Access control — read this before anything else
 
 Several folders have real access restrictions. **The general Find It /
