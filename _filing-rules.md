@@ -331,6 +331,63 @@ question ("is this for a specific job, or a department-wide record?"),
 or route to human review. This applies doubly to anything that might
 touch a restricted folder — when in doubt, treat it as restricted.
 
+**Confirmed (Sep 23): this rule applies to Find It, not just File It.**
+The single highest-value place to ask rather than guess is the very
+first branch decision — job-specific vs. department-wide — since a
+wrong guess there sends someone looking in the wrong tree entirely.
+
+## Find It — answer shape (confirmed Sep 23)
+
+Every Find It answer, once a file or folder is identified, should
+briefly explain *why* — citing the relevant rule from this document
+("per company policy, HOA documents for a job live under that job's
+`01 HOA DOCUMENTS` folder") — not just return a bare link. This is
+what all the category descriptions and disambiguation notes above are
+*for*; the answer should surface that reasoning, not just consult it
+silently.
+
+**If nothing matches:** don't return an empty-handed refusal alone.
+Return the closest confident parent folder as a starting point (e.g.
+"I couldn't find that specific file, but marketing materials like this
+generally live under `04 Marketing Shared/PLANS` — here's a link to
+that folder") so the person has somewhere real to look, without
+inventing a specific file that isn't there.
+
+## File It — replacing an existing file (confirmed Sep 23)
+
+Before writing a new file, check whether a file of the **exact same
+name** already exists at the destination.
+
+- **No match found:** write normally, as already specified.
+- **Exact name already exists:** ask first — *"A file named `<name>`
+  already exists there. Replace it?"* Never overwrite silently.
+- **On "yes":** don't delete the old file — move it into a `_archive/`
+  subfolder inside the same destination folder, renamed
+  `<original-filename>__replaced-YYYYMMDD-HHMMSS.ext`, *then* write the
+  new file in its place. This is the same "retire, don't delete"
+  discipline already used elsewhere in this project (P4), applied to
+  replacements instead of retirements — and it's what keeps
+  `placements_log`'s one-click-undo promise meaningful; a true
+  overwrite would leave nothing to undo *to*.
+- **Starting point, not the end state:** this project may move to a
+  true overwrite later, once the tool has earned enough trust that the
+  archive step feels redundant — same "confirm-then-execute now, tighten
+  later" arc as the rest of Phase 1 (see P7's own framing of this in
+  the build spec).
+
+**Keeping `_archive/` from becoming its own mess — retention (confirmed
+Sep 23, 90-day default):** a scheduled job (same shape as the existing
+nightly/weekly crons already running) deletes anything inside any
+`_archive/` folder older than **90 days**. `placements_log` keeps the
+permanent record of the replacement (source file, matched job,
+destination, timestamp, flagged as a replacement) forever — only the
+old file's bytes get reclaimed after 90 days, never the fact that it
+happened. The write account needs delete rights, but scoped *only* to
+`_archive/` subfolders (Synology's per-subfolder Advanced Permissions
+supports this) — the main content tree stays exactly as
+create/write-restricted as originally designed; delete exists in
+exactly one place, and only for files already marked temporary.
+
 ## Open items to resolve before this goes live
 
 1. ~~**HR access list**~~ — **resolved.** See Access control above.

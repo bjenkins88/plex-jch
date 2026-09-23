@@ -98,6 +98,14 @@ tracked).
 4. Response includes a clickable link: `smb://jdbsrv/<path>` by default
    (per P7 — reliable, no DSM API dependency). A File Station deep link
    is a later polish item, not a blocker.
+5. **(Confirmed Sep 23)** If it's unclear which category/job a query
+   means — especially whether it's job-specific at all — ask a
+   clarifying question before answering, same fallback rule as File It.
+   Once answered, briefly explain *why* using `_filing-rules.md`'s own
+   language ("per policy, ..."), not just a bare link. If nothing
+   matches, return the closest confident **parent folder** as a
+   starting point instead of an empty refusal. See `_filing-rules.md`,
+   "Find It — answer shape" section for the full spec.
 
 ---
 
@@ -115,12 +123,34 @@ tracked).
 5. Propose a destination + filename
    (`<JobCode>_<DocType>_<YYYY-MM-DD>_<slug>.ext`), then ask: **"Would
    you like me to place it there?"**
-6. On yes: a *separate* write-capable DSM account — create-only, no
-   delete/overwrite, ACL-scoped to the same confirmed folders as
-   Component 2 — performs the SFTP write.
+5a. **(Confirmed Sep 23)** Before writing, check whether a file with
+   that *exact* name already exists at the destination. If not, proceed
+   as below. If it does, ask a second, separate question — *"A file
+   named `<name>` already exists there. Replace it?"* — never overwrite
+   silently.
+6. On yes: a *separate* write-capable DSM account — create-only for new
+   files, ACL-scoped to the same confirmed folders as Component 2 —
+   performs the SFTP write. **(Confirmed Sep 23)** On a confirmed
+   replace, the account first moves the existing file into a
+   `_archive/` subfolder of the same destination (renamed
+   `<name>__replaced-YYYYMMDD-HHMMSS.ext`), then writes the new file —
+   never a true in-place overwrite yet. This is deliberately the
+   starting point, not the end state: expected to move to a true
+   overwrite later, once the tool has earned enough trust that the
+   archive step feels redundant.
 7. Log every placement (source file, matched job, destination,
-   timestamp) to a `placements_log` table. This is the undo mechanism —
-   there is no other one.
+   timestamp, and whether it was a fresh placement or a replacement) to
+   a `placements_log` table. This is the undo mechanism — there is no
+   other one, and it's what makes it safe for `_archive/` to eventually
+   get cleaned up (see below) without losing the historical record.
+8. **(Confirmed Sep 23) `_archive/` retention:** a scheduled job (same
+   shape as the existing nightly/weekly crons) deletes anything inside
+   any `_archive/` folder older than **90 days**. The write account
+   needs delete rights for this, scoped *only* to `_archive/`
+   subfolders via Synology's per-subfolder Advanced Permissions — the
+   main content tree stays exactly as create-only as originally
+   designed. See `_filing-rules.md`, "File It — replacing an existing
+   file" for the full spec.
 
 ---
 
@@ -131,6 +161,13 @@ tracked).
 enforced by the OS, not by asking the model nicely. Defense in depth:
 even a broken prompt or a jailbreak attempt can't write somewhere the
 account has no access to.
+
+**(Confirmed Sep 23) The one place this account gets delete rights:**
+`_archive/` subfolders only, via Synology's per-subfolder Advanced
+Permissions, so the 90-day retention job (Component 3, step 8) can
+actually clean up. Every other in-scope folder stays create/write
+without delete — delete exists in exactly one narrowly-scoped place,
+never on primary content.
 
 **Tool-logic level (policy the account *could* technically do, but
 shouldn't without asking):** the write account needs real write access
