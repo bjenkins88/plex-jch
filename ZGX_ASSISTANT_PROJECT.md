@@ -363,6 +363,23 @@ per category needs real business judgment, not a guess from outside the
 company — this document only specifies the template and the discipline
 around it.
 
+**Update Sept 23 — a real first draft now exists:** `_filing-rules.md`
+is written, built from Bethany's actual dictated description of the
+`jdbsrv` folder structure plus real screenshots (`01 Job-Related`,
+`02 Not-Job-Specific`, and the canonical top-level `04 Marketing
+Shared`). It covers the access-restricted folders (`07 HR`, `09
+Accounting`, `Accounting-Backup-ONLY`), the folders that are never a
+filing destination (system folders and infrastructure shares), the
+two-part routing job-related files need (job name + status bucket), and
+several known misplacements already caught in the dictation (a
+duplicate nested `04 Marketing Shared`, `Marketing Collateral` sitting
+in the wrong share, `04 Photos and Video of Projects` superseded by the
+`photo` share). Marketing Shared's own subfolders are filled in from
+folder names alone and explicitly flagged as unconfirmed. Three open
+items remain before this is trustworthy enough to build against: the
+real HR access list, what `video`/`Video to Share` are for, and
+confirming the Marketing Shared subfolder guesses.
+
 ## P5 — Resuming this: start here
 
 1. **Build the P7 Phase 1 tool.** Doesn't require the existing mess
