@@ -34,7 +34,7 @@ WRHS,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 ADMS2018,10 Completed Projects,ADMS 2018,exact-code+year,high,
 ALVR 2014,10 Completed Projects,ALVR 2014,exact-code+year,high,
 ANDR 2016,10 Completed Projects,ANDR 2016,exact-code+year,high,
-BARK2012,10 Completed Projects,BRKS 2021,fuzzy(0.75),low,unconfirmed - verify manually
+BARK2012,10 Completed Projects,,fuzzy(0.75),none,"Reviewed by Bethany - not a match, no BT record for this folder"
 BRNC2018,10 Completed Projects,BRNC 2018,exact-code+year,high,
 BSTN2020,10 Completed Projects,BSTN 2020,exact-code+year,high,
 CAIN 2013,10 Completed Projects,CAIN 2013,exact-code+year,high,
@@ -46,7 +46,7 @@ CRTS2018,10 Completed Projects,CRTS 2018,exact-code+year,high,
 Dailey 2015,10 Completed Projects,DALY Remodel,fuzzy(0.80),low,unconfirmed - verify manually
 DASS2019,10 Completed Projects,DASS 2019,exact-code+year,high,
 Davison,10 Completed Projects,DVIS 2020,fuzzy(0.73),low,unconfirmed - verify manually
-DRZF 2011,10 Completed Projects,DRFW 2020,fuzzy(0.75),low,unconfirmed - verify manually
+DRZF 2011,10 Completed Projects,,fuzzy(0.75),none,"Reviewed by Bethany - not a match, no BT record for this folder"
 DTHT2019,10 Completed Projects,DTHT 2019,exact-code+year,high,
 DVIS2020,10 Completed Projects,DVIS 2020,exact-code+year,high,
 EDWR 2016,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
@@ -86,8 +86,8 @@ KLNG 2010,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT r
 Koneval,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 KPNT 2013,10 Completed Projects,KPNT 2013,exact-code+year,high,
 KPNT2021,10 Completed Projects,KPNT 2021,exact-code+year,high,
-LBLC2018,10 Completed Projects,LBLN 2018; LBLN 2020,fuzzy(0.75),low,unconfirmed - verify manually
-LBNC2012,10 Completed Projects,BRNC 2018,fuzzy(0.75),low,unconfirmed - verify manually
+LBLC2018,10 Completed Projects,LBLN 2018,confirmed-by-bethany,high,Bethany picked this one from the earlier multi-candidate list
+LBNC2012,10 Completed Projects,,fuzzy(0.75),none,"Reviewed by Bethany - not a match, no BT record for this folder"
 LBRN 2009,10 Completed Projects,LBRN 2015,code-match-year-differs,medium,server year 2009 vs BT year 2015 - verify
 LHEC2021,10 Completed Projects,LHEC 2021,exact-code+year,high,
 LRTZ 2013,10 Completed Projects,LRTZ 2013,exact-code+year,high,
@@ -102,17 +102,17 @@ Miller-507 Golden Bear,10 Completed Projects,,no-match,none,likely pre-BuilderTr
 MLLR 2011,10 Completed Projects,MLLR 2012,code-match-year-differs,medium,server year 2011 vs BT year 2012 - verify
 MRBL 2010,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 NGLE 2017,10 Completed Projects,NGLE 2017,exact-code+year,high,
-NSLN 2016,10 Completed Projects,JNSN_E&S 2022,fuzzy(0.75),low,unconfirmed - verify manually
+NSLN 2016,10 Completed Projects,,fuzzy(0.75),none,"Reviewed by Bethany - not a match, no BT record for this folder"
 NSMT2021,10 Completed Projects,NSMT 2021,exact-code+year,high,
 NWTN Remodel,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 OFFICE KITCHEN,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 OPSM2014,10 Completed Projects,OPSM 2014,exact-code+year,high,
-OSBN 2010,10 Completed Projects,OSBN 2012; OSBN 2014,code-match-multiple-BT-entries,medium,"2 BT jobs share this code - pick correct one, or all are sub-phases of one project"
-OSBN 2013,10 Completed Projects,OSBN 2012; OSBN 2014,code-match-multiple-BT-entries,medium,"2 BT jobs share this code - pick correct one, or all are sub-phases of one project"
+OSBN 2010,10 Completed Projects,OSBN 2012,confirmed-by-bethany,high,Bethany picked this one from the earlier multi-candidate list
+OSBN 2013,10 Completed Projects,OSBN 2014,confirmed-by-bethany,high,Bethany picked this one from the earlier multi-candidate list
 OSBN 2014,10 Completed Projects,OSBN 2014,exact-code+year,high,
-OXFD2022,10 Completed Projects,OXFR 2016; OXFR 2022; SP-OXFR 2025,fuzzy(0.75),low,unconfirmed - verify manually
+OXFD2022,10 Completed Projects,OXFR 2022,confirmed-by-bethany,high,Bethany picked this one from the earlier multi-candidate list
 OXFR2016,10 Completed Projects,OXFR 2016,exact-code+year,high,
-PARADE 2008,10 Completed Projects,,no-match,none,Confirmed by Bethany: pre-BuilderTrend job (the "Parade Home 08" already referenced in the media-indexing work) - no BT record expected
+PARADE 2008,10 Completed Projects,,no-match,none,"Confirmed by Bethany: pre-BuilderTrend job (the ""Parade Home 08"" already referenced in the media-indexing work) - no BT record expected"
 PCZT2014,10 Completed Projects,PCZT 2014,exact-code+year,high,
 PHLP2020,10 Completed Projects,PHLP 2020,exact-code+year,high,
 PRCE 2013,10 Completed Projects,PRCE 2014,code-match-year-differs,medium,server year 2013 vs BT year 2014 - verify
