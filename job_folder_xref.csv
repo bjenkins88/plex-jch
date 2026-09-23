@@ -1,0 +1,143 @@
+server_folder_name,status_bucket,buildertrend_job_name(s),match_method,confidence,notes
+AMLG2021,05 Active Projects,AMLG 2021 - Design,exact-code+year,high,
+BDLV 2026,05 Active Projects,BDLV 2026 - Design,exact-code+year,high,
+BRDS 2026,05 Active Projects,BRDS 2026 - Design,exact-code+year,high,
+BRGL2021,05 Active Projects,BRGL 2021,exact-code+year,high,
+BRGR2020,05 Active Projects,BRGR 2020,exact-code+year,high,
+BRGT 2026,05 Active Projects,BRGT 2026 - Design,exact-code+year,high,
+CVRD 2026,05 Active Projects,CVRD 2026 - Design,exact-code+year,high,
+DBBS2026,05 Active Projects,DBBS 2026- Remodel,exact-code+year,high,
+DRFW2020,05 Active Projects,DRFW 2020,exact-code+year,high,
+ECHN2023,05 Active Projects,ECHN 2023,exact-code+year,high,
+FRVW 2026,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+HBNR2025,05 Active Projects,HBNR 2025-Design,exact-code+year,high,
+HCKS2025,05 Active Projects,HCKS 2025 - Remodel,exact-code+year,high,
+HSMN2024,05 Active Projects,HSMN 2024,exact-code+year,high,
+JDBO2023,05 Active Projects,SP-JDBO 2024,code-match-year-differs,medium,server year 2023 vs BT year 2024 - verify
+JNKS2023,05 Active Projects,JNSN_E&S 2022,fuzzy(0.75),low,unconfirmed - verify manually
+LDDR2025,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+LMND 2023,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+LRSN 2025,05 Active Projects,LRSN 2025 - Design,exact-code+year,high,
+MCLN 2024,05 Active Projects,MCLN 2024,exact-code+year,high,
+MRKM 2026,05 Active Projects,MRKM 2026 - Design,exact-code+year,high,
+MRTN2021,05 Active Projects,MRTN 2021 - Design,exact-code+year,high,
+OSWL2025,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+PRNG2021,05 Active Projects,PRNG 2021 - Design,exact-code+year,high,
+RDRG 2025,05 Active Projects,RDRG 2025-Furnishings; RDRG 2025-Remodel,exact-code+year,high,
+RNNR 2025,05 Active Projects,RNNR 2025 - Design; RNNR 2025 - Interior Design Schedule Only,exact-code+year,high,
+SLDN 2024,05 Active Projects,SLDN 2024 - Design,exact-code+year,high,
+SMTH 2017,05 Active Projects (also seen in Completed - verify),SMTH 2017,exact-code+year,high,
+SMTH2025,05 Active Projects,SMTH 2017; SMTH 2023; SMTH 2026 - Design,code-match-multiple-BT-entries,medium,"3 BT jobs share this code - pick correct one, or all are sub-phases of one project"
+SYLV 2026,05 Active Projects,SYLV 2026 - Design,exact-code+year,high,
+TJOS2022,05 Active Projects,TJOS 2022,exact-code+year,high,
+TRAVIS CLUB,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+WRHS,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+ADMS2018,10 Completed Projects,ADMS 2018,exact-code+year,high,
+ALVR 2014,10 Completed Projects,ALVR 2014,exact-code+year,high,
+ANDR 2016,10 Completed Projects,ANDR 2016,exact-code+year,high,
+BARK2012,10 Completed Projects,BRKS 2021,fuzzy(0.75),low,unconfirmed - verify manually
+BRNC2018,10 Completed Projects,BRNC 2018,exact-code+year,high,
+BSTN2020,10 Completed Projects,BSTN 2020,exact-code+year,high,
+CAIN 2013,10 Completed Projects,CAIN 2013,exact-code+year,high,
+CLRK 2014,10 Completed Projects,CLRK 2015,code-match-year-differs,medium,server year 2014 vs BT year 2015 - verify
+CNNR 2018,10 Completed Projects,CNNR 2018,exact-code+year,high,
+Community First,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+CRTR 2016,10 Completed Projects,CRTR 2017,code-match-year-differs,medium,server year 2016 vs BT year 2017 - verify
+CRTS2018,10 Completed Projects,CRTS 2018,exact-code+year,high,
+Dailey 2015,10 Completed Projects,DALY Remodel,fuzzy(0.80),low,unconfirmed - verify manually
+DASS2019,10 Completed Projects,DASS 2019,exact-code+year,high,
+Davison,10 Completed Projects,DVIS 2020,fuzzy(0.73),low,unconfirmed - verify manually
+DRZF 2011,10 Completed Projects,DRFW 2020,fuzzy(0.75),low,unconfirmed - verify manually
+DTHT2019,10 Completed Projects,DTHT 2019,exact-code+year,high,
+DVIS2020,10 Completed Projects,DVIS 2020,exact-code+year,high,
+EDWR 2016,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+EVRS 2017,10 Completed Projects,EVRS 2017,exact-code+year,high,
+FLAS 2013,10 Completed Projects,FLAS 2013,exact-code+year,high,
+FLGG 2017,10 Completed Projects,FLGG 2017,exact-code+year,high,
+FRMR 2011,10 Completed Projects,FRMR 2013,code-match-year-differs,medium,server year 2011 vs BT year 2013 - verify
+FRMR 2013,10 Completed Projects,FRMR 2013,exact-code+year,high,
+FRNK 2017,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+FSHR 2013,10 Completed Projects,FSHR 2013,exact-code+year,high,
+FSTR2021,10 Completed Projects,FSTR 2021,exact-code+year,high,
+Glenn,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+GROUP FILE,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+GRVS 2016,10 Completed Projects,GRVS 2016,exact-code+year,high,
+HALE 2009,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+Harvey,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+HCKM 2012,10 Completed Projects,HCKM 2012,exact-code+year,high,
+HDSL 2012,10 Completed Projects,HDSL 2012,exact-code+year,high,
+HFTH 2014,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+HIETT 2014,10 Completed Projects,HIET 2014,fuzzy(0.89),low,unconfirmed - verify manually
+HRRS 2012,10 Completed Projects,HRRS 2012,exact-code+year,high,
+HUFF 2014,10 Completed Projects,HUFF 2014,exact-code+year,high,
+JCMT2023,10 Completed Projects,JCMT 2023,exact-code+year,high,
+JenkinsBarn,10 Completed Projects,JNSN_BARN 2022,fuzzy(0.74),low,unconfirmed - verify manually
+JHNS_T 2021,10 Completed Projects,JHNS_T 2021,exact-code+year,high,
+JNKF 2023,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+JNKM2023,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+JNKN 2019,10 Completed Projects,JNSN_E&S 2022,fuzzy(0.75),low,unconfirmed - verify manually
+JNPR 2012,10 Completed Projects,JNPR 2013,code-match-year-differs,medium,server year 2012 vs BT year 2013 - verify
+JONES,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+JONES 2010,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+JPPB2015,10 Completed Projects,JPPB 2016,code-match-year-differs,medium,server year 2015 vs BT year 2016 - verify
+JSMTH 2020,10 Completed Projects,JSMT 2020,fuzzy(0.89),low,unconfirmed - verify manually
+JSPH 2012,10 Completed Projects,JSPH 2012,exact-code+year,high,
+KHLR 2017,10 Completed Projects,KHLR 2017,exact-code+year,high,
+KLNG 2010,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+Koneval,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+KPNT 2013,10 Completed Projects,KPNT 2013,exact-code+year,high,
+KPNT2021,10 Completed Projects,KPNT 2021,exact-code+year,high,
+LBLC2018,10 Completed Projects,LBLN 2018; LBLN 2020,fuzzy(0.75),low,unconfirmed - verify manually
+LBNC2012,10 Completed Projects,BRNC 2018,fuzzy(0.75),low,unconfirmed - verify manually
+LBRN 2009,10 Completed Projects,LBRN 2015,code-match-year-differs,medium,server year 2009 vs BT year 2015 - verify
+LHEC2021,10 Completed Projects,LHEC 2021,exact-code+year,high,
+LRTZ 2013,10 Completed Projects,LRTZ 2013,exact-code+year,high,
+LWND 2007,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+LXHS 2014,10 Completed Projects,LXSH 2014,fuzzy(0.75),low,unconfirmed - verify manually
+Mackie,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+MANZ 2015,10 Completed Projects,MANZ 2015,exact-code+year,high,
+MAXY 2018,10 Completed Projects,MAXY 2018,exact-code+year,high,
+MCDM2023,10 Completed Projects,MCDM 2023,exact-code+year,high,
+MCGH2021,10 Completed Projects,MCGH 2021,exact-code+year,high,
+Miller-507 Golden Bear,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+MLLR 2011,10 Completed Projects,MLLR 2012,code-match-year-differs,medium,server year 2011 vs BT year 2012 - verify
+MRBL 2010,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+NGLE 2017,10 Completed Projects,NGLE 2017,exact-code+year,high,
+NSLN 2016,10 Completed Projects,JNSN_E&S 2022,fuzzy(0.75),low,unconfirmed - verify manually
+NSMT2021,10 Completed Projects,NSMT 2021,exact-code+year,high,
+NWTN Remodel,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+OFFICE KITCHEN,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+OPSM2014,10 Completed Projects,OPSM 2014,exact-code+year,high,
+OSBN 2010,10 Completed Projects,OSBN 2012; OSBN 2014,code-match-multiple-BT-entries,medium,"2 BT jobs share this code - pick correct one, or all are sub-phases of one project"
+OSBN 2013,10 Completed Projects,OSBN 2012; OSBN 2014,code-match-multiple-BT-entries,medium,"2 BT jobs share this code - pick correct one, or all are sub-phases of one project"
+OSBN 2014,10 Completed Projects,OSBN 2014,exact-code+year,high,
+OXFD2022,10 Completed Projects,OXFR 2016; OXFR 2022; SP-OXFR 2025,fuzzy(0.75),low,unconfirmed - verify manually
+OXFR2016,10 Completed Projects,OXFR 2016,exact-code+year,high,
+PARADE 2008,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+PCZT2014,10 Completed Projects,PCZT 2014,exact-code+year,high,
+PHLP2020,10 Completed Projects,PHLP 2020,exact-code+year,high,
+PRCE 2013,10 Completed Projects,PRCE 2014,code-match-year-differs,medium,server year 2013 vs BT year 2014 - verify
+PSCC 2017,10 Completed Projects,PSCC 2017,exact-code+year,high,
+PSCH 2014,10 Completed Projects,PSCH 2014,exact-code+year,high,
+PWLL 2017,10 Completed Projects,PWLL 2017,exact-code+year,high,
+RHPH 2016,10 Completed Projects,RHPH 2016,exact-code+year,high,
+RJSH2019,10 Completed Projects,RJSH 2019,exact-code+year,high,
+ROARK,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+ROUS 2021,10 Completed Projects,ROUS 2021,exact-code+year,high,
+RPP 2012,10 Completed Projects,RAPP 2016,fuzzy(0.86),low,unconfirmed - verify manually
+RSNT 2017,10 Completed Projects,RSNT 2017,exact-code+year,high,
+RYNL 2019,10 Completed Projects,RYNL 2019,exact-code+year,high,
+SHFR 2013,10 Completed Projects,SHFR 2013,exact-code+year,high,
+Silver Whisk,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+SKOBLA 2009,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+THMP 2021,10 Completed Projects,THMP 2021,exact-code+year,high,
+TNDL 2013,10 Completed Projects,TNDL 2013,exact-code+year,high,
+TRNT 2021,10 Completed Projects,TRNT 2021,exact-code+year,high,
+Van Burkleo 2010,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+WLCX2019,10 Completed Projects,WLCX 2019,exact-code+year,high,
+WLMS 2013,10 Completed Projects,WLMS,code-match-year-differs,medium,server year 2013 vs BT year None - verify
+WLSH 2012,10 Completed Projects,WLSH 2012,exact-code+year,high,
+WRNR 2013,10 Completed Projects,WRNR 2013,exact-code+year,high,
+WTRB 2012,10 Completed Projects,WTRB 2012,exact-code+year,high,
+WTRB 2014,10 Completed Projects,WTRB 2012,code-match-year-differs,medium,server year 2014 vs BT year 2012 - verify
+ZEY 2016,10 Completed Projects,ZEY 2016,exact-code+year,high,

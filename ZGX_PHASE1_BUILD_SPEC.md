@@ -36,15 +36,50 @@ Nothing yet confirms those names match the actual folder names under
 `01 Job-Related/05 Active Projects` / `10 Completed Projects` /
 `20 Inactive Projects`.
 
-**Build:**
-1. Add a `server_folder_path` column to `jobs` (or a separate
-   `job_folder_map` table if a job ever has more than one folder).
-2. Walk the real folders under the three status directories via SFTP.
-3. Fuzzy-match each folder name against `jobs.job_name` (Postgres
-   `pg_trgm` similarity is the natural fit, already Postgres-native).
-4. Anything below a confidence threshold → a review list for Bethany,
-   not an auto-match. This is a one-time reconciliation, not something
-   to get cute about automating fully on the first pass.
+**Status: a real first pass exists — `job_folder_xref.csv`.** Built by
+exporting the real BuilderTrend job list (`Jobsites-4.xls`, 177 jobs,
+read via `xlrd`) and matching it against 142 real server folder names
+from `05 Active Projects` and `10 Completed Projects` (from screenshots;
+`20 Inactive Projects` not captured yet). Matching logic: parse each
+name into an alpha code + a year, match on the code, then check whether
+the year agrees.
+
+Results: **82 high-confidence exact matches** (code and year both
+agree), **14 medium-confidence** (code matches, year differs by a
+consistent-looking 1–6 years, or multiple BT sub-phase jobs share one
+code), **15 low-confidence fuzzy matches** (no code match, closest
+string match only — do not trust these without a look), **31 no-match**
+(no reasonable BT counterpart found — expected, since the server
+predates BuilderTrend and holds older completed jobs BuilderTrend never
+tracked).
+
+**Worth a specific look, not just "verify eventually":**
+- The medium-confidence "year differs" group isn't noise — it's a
+  consistent pattern (server year usually *earlier* than the matching
+  BT year), which reads like the server folder was created at contract
+  signing while BuilderTrend's year reflects a later re-entry or
+  relabeling. Still worth a human glance, but this group is a good bet
+  to be correct, not a coin flip.
+- `JDBO2023` (Active) only fuzzy/medium-matched `SP-JDBO 2024` — but
+  "JDBO" reads like it could be an internal/overhead code (Jenkins
+  Design Build...) rather than a client job. Check this one separately
+  before trusting the match.
+- `SMTH 2017` appears in *both* the Active and Completed screenshots —
+  a real duplicate-or-stale-folder question, not a matching-algorithm
+  problem.
+- `PARADE 2008` (no BT match) is almost certainly the same "Parade Home
+  08" already referenced elsewhere in this project's media-indexing
+  work — a pre-BuilderTrend marketing/showcase job, not a missing match
+  to chase.
+
+**Still needed before this is complete:**
+1. `20 Inactive Projects` folder names haven't been captured yet.
+2. Someone needs to actually resolve the medium/low-confidence rows and
+   confirm the 31 no-matches are genuinely pre-BuilderTrend rather than
+   a naming mismatch the algorithm missed.
+3. Once resolved, load `job_folder_xref.csv` into Postgres as the real
+   `server_folder_path` column/table — this file is the draft, not the
+   final schema.
 
 ---
 
