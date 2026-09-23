@@ -175,7 +175,17 @@ working documents.
 
 ### 02 Selections and Interiors
 **What belongs here:** interior designers' and the selections team's
-department-level material.
+department-level material — including interior analyses, selections
+records, and similar Interior Design department documents. Real existing
+subfolder structure includes `Interiors/INTERIOR ANALYSIS` — prefer
+placing a matching document there over the bare category root when a
+fitting subfolder already exists (confirmed Sep 23, real example:
+`Interior Analysis.docx`).
+**Not this — see instead:** a company-wide administrative form or
+procedure (e.g. a generic interoffice request form) goes in
+`11 Interoffice Forms & Procedures` instead — that folder is for
+company-wide process paperwork, not one department's own working
+documents.
 
 ### 03 Accounting Procedures
 **What belongs here:** how the accounting department does things —
