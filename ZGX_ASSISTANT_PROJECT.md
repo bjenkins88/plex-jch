@@ -367,18 +367,33 @@ around it.
 is written, built from Bethany's actual dictated description of the
 `jdbsrv` folder structure plus real screenshots (`01 Job-Related`,
 `02 Not-Job-Specific`, and the canonical top-level `04 Marketing
-Shared`). It covers the access-restricted folders (`07 HR`, `09
-Accounting`, `Accounting-Backup-ONLY`), the folders that are never a
-filing destination (system folders and infrastructure shares), the
-two-part routing job-related files need (job name + status bucket), and
-several known misplacements already caught in the dictation (a
-duplicate nested `04 Marketing Shared`, `Marketing Collateral` sitting
-in the wrong share, `04 Photos and Video of Projects` superseded by the
-`photo` share). Marketing Shared's own subfolders are filled in from
-folder names alone and explicitly flagged as unconfirmed. Three open
-items remain before this is trustworthy enough to build against: the
-real HR access list, what `video`/`Video to Share` are for, and
-confirming the Marketing Shared subfolder guesses.
+Shared`). It covers the access-restricted folders, the folders that are
+never a filing destination, and the two-part routing job-related files
+need (job name + status bucket).
+
+**Update, same day, second pass:** Bethany corrected and extended it
+with real permission detail:
+- Full HR access breakdown by person (Garrett/Clyde/Skyler North:
+  read+write, no delete; Sarah: read+write+delete; Bethany/Shan/Truitt:
+  full).
+- A new read-open/write-restricted category: `photo`/`photo_1` (write:
+  Adaline + admins only) and `04 Marketing Shared` (write: PJ Madiera,
+  Adaline, admins only).
+- **A correction, not just an addition:** `01 Job-Related/Marketing
+  Collateral` was flagged as a misplacement in the first draft — wrong.
+  It's a deliberate workflow: Designers don't have write access to
+  `04 Marketing Shared`, so this is their real drop-off point.
+- The duplicate nested `04 Marketing Shared` has been deleted from the
+  server — resolved, not just documented as an error.
+- **Two new open items surfaced, not yet built:** (1) there's no
+  mapping yet between BuilderTrend's job names and the server's actual
+  job folder names — needed for reliable filing *and* for
+  cross-referencing file-server content against BuilderTrend/cost data
+  more broadly; (2) a proposed (not previously recorded, so explicitly
+  unconfirmed) rule for when the tool should also suggest a BuilderTrend
+  upload, separate from the server destination — grounded in the
+  existing human-approved BuilderTrend push-back pattern (Phase 3)
+  rather than a new risk pattern.
 
 ## P5 — Resuming this: start here
 

@@ -22,21 +22,35 @@ stop, regardless of which department produced it.
 
 ## Access control — read this before anything else
 
-Three folders are restricted. **The general Find It / File It tool must
-never search, suggest, or write into these** unless the person asking
-has been specifically confirmed to have access. This isn't a filing
-preference, it's a hard boundary — same principle already used for
-sensitive HR content in the rest of this project.
+Several folders have real access restrictions. **The general Find It /
+File It tool must never search, suggest, or write into a
+read-restricted folder, and must never write to a write-restricted one**
+unless the person asking has been specifically confirmed to have that
+level of access. This isn't a filing preference, it's a hard boundary —
+same principle already used for sensitive content elsewhere in this
+project.
 
-| Folder | Restricted to |
+**Read + write restricted (not searchable or writable by anyone else):**
+
+| Folder | Access |
 |---|---|
-| `02 Not-Job-Specific/07 HR (Human Resources)` | Specifically granted individuals only — exact list still to be defined (Bethany to specify) |
+| `02 Not-Job-Specific/07 HR (Human Resources)` | Garrett, Clyde, Skyler North — read/write, **no delete**. Sarah — read/write/delete. Bethany, Shan, Truitt — full (administrators). No one else. |
 | `09 Accounting` *(top-level share, not the "03 Accounting Procedures" folder below)* | Peggy, Shan, Bethany, Truitt only |
 | `Accounting-Backup-ONLY` | Same access as `09 Accounting` |
 
-**Open item:** the exact HR access list needs to be written down before
-this goes live — "specifically given it" isn't enough for the tool to
-enforce.
+**Read-open, write-restricted** (the tool can search/suggest these for
+anyone, but must never perform a write unless the uploader is on the
+list):
+
+| Folder | Who can write |
+|---|---|
+| `photo` / `photo_1` | Adaline, plus administrators (Shan, Bethany, Truitt) only. Everyone can read/browse. |
+| `04 Marketing Shared` *(top-level, canonical)* | PJ Madiera, Adaline, plus administrators (Shan, Bethany, Truitt) only — **not** the Designers (see `Marketing Collateral` below for how their contributions actually flow in). |
+
+A delete-capable account is a bigger deal than a write-only one — if the
+"File It" tool's own service account ever needs delete rights on any of
+these (it shouldn't, per P7's create-only design), that's a decision
+for Bethany/Shan/Truitt specifically, not a default.
 
 ---
 
@@ -78,6 +92,20 @@ that's a known, accepted drift, not a bug to chase.
      they should — match the job, not the folder it happens to be in
      today, if the two disagree.)
 
+**Open build item — the job-name mapping doesn't exist yet.** Step 1
+above assumes a BuilderTrend job name reliably identifies a folder on
+the server, but nothing has confirmed the two actually use the same
+names. The real `jobs` table (`jdb_costs.jobs`, 177 BuilderTrend job
+names) and the server's actual folder names under `05 Active
+Projects` / `10 Completed Projects` / `20 Inactive Projects` need an
+explicit cross-reference — a `server_folder_name` column added to
+`jobs`, or a separate mapping table — built once, by walking the real
+folders and matching each to its BuilderTrend record. Bethany flagged
+this as important beyond filing, too: it's what makes cross-referencing
+file-server content against BuilderTrend/cost data possible at all.
+Until this mapping exists, treat any job-name match as **unconfirmed**
+and route to human review rather than assume the strings line up.
+
 **Non-job-bucketed folders under `01 Job-Related`:**
 
 | Folder | What belongs here |
@@ -99,11 +127,20 @@ that's a known, accepted drift, not a bug to chase.
   told explicitly; default new photos to `photo` instead.
 - `60 Buildtools Archive Data` — old data from a pre-BuilderTrend tool
   ("Buildtools"). Archive only — never a destination for a new file.
-- `Marketing Collateral` — **known misplacement.** Should be under the
-  top-level `04 Marketing Shared` share instead. Don't file new items
-  here even though old ones exist.
 - `Temporary Items`, `Website` — legacy; `Website` in particular is
   flagged for archiving. Not filing destinations.
+
+**Not a misplacement — a real, deliberate workflow:**
+
+- `Marketing Collateral` — this exists *because* the Designers don't
+  have write access to `04 Marketing Shared` (that folder is
+  write-restricted to PJ Madiera, Adaline, and administrators — see
+  Access control above). This is the Designers' legitimate drop-off
+  point for anything marketing-bound. **Routing rule:** if a Designer is
+  filing something for the marketing department, it goes here, not to
+  `04 Marketing Shared` directly (they can't write there anyway). If
+  PJ Madiera, Adaline, or an administrator is filing it, it goes
+  straight to `04 Marketing Shared`.
 
 ---
 
@@ -135,11 +172,11 @@ procedures and process documents.
 restricted `09 Accounting` top-level share, not here — this folder is
 about process, not the numbers themselves.
 
-### 04 Marketing Shared *(nested copy — likely a duplicate)*
-**Flagged by Bethany as probably a mistake.** The real, canonical
-Marketing Shared is the top-level `04 Marketing Shared` share (shared
-between Marketing and Sales), not this nested folder. Route new files
-to the top-level share; don't perpetuate the duplicate.
+### 04 Marketing Shared *(nested copy — deleted)*
+**Resolved.** This duplicate has been removed from the server. The real,
+canonical Marketing Shared is the top-level `04 Marketing Shared` share
+(see its own section below). If a folder with this name ever reappears
+here, that's an error, not a valid destination.
 
 ### 05 Designers
 **What belongs here:** architects/designers/interior designers'
@@ -211,9 +248,15 @@ existing candidate home for harvested WORKFLOW- content per P4/P7.
 
 ## `04 Marketing Shared` *(top-level, canonical)*
 
-Shared between the Marketing and Sales departments. Real subfolder list
-below — **descriptions are inferred from the folder names, not yet
-confirmed by Bethany; treat as a first draft, not settled rules.**
+Shared between the Marketing and Sales departments. **Write access is
+restricted to PJ Madiera, Adaline, and administrators** (see Access
+control above) — everyone else, Designers included, can read but not
+write here. A Designer filing something marketing-bound goes to
+`01 Job-Related/Marketing Collateral` instead (see that entry above).
+
+Real subfolder list below — **descriptions are inferred from the folder
+names, not yet confirmed by Bethany; treat as a first draft, not settled
+rules.**
 
 | Subfolder | Best guess at what belongs here (needs confirmation) |
 |---|---|
@@ -238,6 +281,34 @@ trusted for real filing decisions — right now it's a best guess from
 folder names alone, exactly the kind of thing this document exists to
 replace with your actual intent.
 
+## Suggesting a BuilderTrend upload, not just a server destination
+
+**Flagging this as proposed, not confirmed** — Bethany asked to "remember
+the rule" for this, but no rule under this exact name is recorded
+anywhere earlier in this project; rather than guess at recalling
+something that may not exist, here's a rule built from what *is*
+already established, for Bethany to confirm or correct:
+
+BuilderTrend is described elsewhere in this project as "where all of
+the jobsite information is contained... we rely on the data in it to be
+accurate and reliable" — the system of record for a job, not just a
+place things happen to also live. A document that's job-related and
+belongs to a category BuilderTrend actually tracks — contracts, change
+orders, permits/inspections, schedule-affecting documents, vendor/trade
+paperwork — should prompt the tool to also ask **"should this go into
+BuilderTrend too?"**, separately from asking where it goes on the file
+server. If yes, that upload goes through the same human-approved
+Browser-Use push-back pattern already built and trusted for BuilderTrend
+data (Phase 3) — never a silent, unconfirmed write into BuilderTrend, for
+the same reason File It's server writes are confirm-then-execute, not
+automatic.
+
+**Not every job-related file qualifies** — a reference photo or an
+internal note doesn't need to go into BuilderTrend just because it's
+job-related. This needs its own short category list (which document
+types trigger the question) once Bethany confirms the general shape of
+the rule.
+
 ## Fallback rule
 
 If the document doesn't clearly match a category above, or matches more
@@ -248,7 +319,9 @@ touch a restricted folder — when in doubt, treat it as restricted.
 
 ## Open items to resolve before this goes live
 
-1. **HR access list** — needs the actual names, not "specifically given it."
+1. ~~**HR access list**~~ — **resolved.** See Access control above.
 2. **`video` / `Video to Share`** — purpose unconfirmed; exclude until Bethany describes them.
 3. **`05 Standard Operating Procedures`** is empty — worth deciding whether this becomes the real home for Project 1's harvested workflow content, or stays separate from `99 Best Practices`.
-4. **`04 Marketing Shared` subfolder descriptions** are inferred from names only — need Bethany's confirmation or correction before the tool relies on them.
+4. **`04 Marketing Shared` subfolder descriptions** are inferred from names only — need Bethany's confirmation or correction before the tool relies on them. (Write-*access* to the folder itself is now confirmed — this item is only about the subfolder-by-subfolder content guesses.)
+5. **BuilderTrend job name ↔ server folder mapping doesn't exist yet** — needs to be built (see the note under "01 Job-Related — routing is two-part"). Blocks reliable job matching for both filing and any cross-referencing against BuilderTrend/cost data.
+6. **The "also upload to BuilderTrend" rule is proposed, not confirmed** — needs Bethany to correct it or confirm it, and to specify which document types should trigger the question.
