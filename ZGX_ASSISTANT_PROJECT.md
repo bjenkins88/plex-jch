@@ -395,6 +395,30 @@ with real permission detail:
   existing human-approved BuilderTrend push-back pattern (Phase 3)
   rather than a new risk pattern.
 
+**Update, third pass:** Bethany confirmed `video`/`Video to Share` are
+unused (permanently excluded now) and confirmed the proposed
+BuilderTrend-upload rule — then extended it into a two-way rule that
+changes the shape of P7/P8 slightly:
+
+- **Server → BuilderTrend** (as proposed): a job-related document in a
+  BuilderTrend-tracked category should prompt the tool to ask before
+  also pushing it to BuilderTrend.
+- **BuilderTrend → server** (new): the reverse holds too, and matters
+  more — "if something goes on BuilderTrend, it probably also needs to
+  be on the server, especially plans or plan documents... we want to
+  own our own data." Same motivation as running the ZGX locally in the
+  first place: BuilderTrend shouldn't become the only copy of anything
+  that matters.
+- **A real gap, named rather than glossed over:** a chat-time "ask when
+  filing" rule only fires when a person brings a file through File It.
+  It can't see a plan uploaded straight into BuilderTrend by someone who
+  never touched the local tool — which is exactly the case the
+  "own our own data" principle most needs covered. Closing that
+  requires extending the *existing* nightly BuilderTrend pull (Phase 3,
+  Bills/Jobs data today) to also catch new plans/attachments and sync
+  or flag them — a pull mechanism, not something a prompt alone can
+  guarantee.
+
 ## P5 — Resuming this: start here
 
 1. **Build the P7 Phase 1 tool.** Doesn't require the existing mess

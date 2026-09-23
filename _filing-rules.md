@@ -68,9 +68,9 @@ an empty search result here as meaningful.
 `chat`, `docker`, `Guest`, `home`, `homes`, `music`, `NetBackup`, `Plex`,
 `PlexMediaServer`, `surveillance`, `usbshare1`, `usbshare2`, `usbshare3`
 
-**Purpose unconfirmed — exclude until checked:** `video`,
-`Video to Share` (not described yet; confirm before including either
-as a real destination)
+**Confirmed unused:** `video`, `Video to Share` — Bethany confirmed
+neither is in active use. Excluded the same as the folders above; not
+candidates worth revisiting.
 
 ---
 
@@ -281,33 +281,47 @@ trusted for real filing decisions — right now it's a best guess from
 folder names alone, exactly the kind of thing this document exists to
 replace with your actual intent.
 
-## Suggesting a BuilderTrend upload, not just a server destination
+## Keeping BuilderTrend and the server in sync — both directions
 
-**Flagging this as proposed, not confirmed** — Bethany asked to "remember
-the rule" for this, but no rule under this exact name is recorded
-anywhere earlier in this project; rather than guess at recalling
-something that may not exist, here's a rule built from what *is*
-already established, for Bethany to confirm or correct:
+**Confirmed by Bethany.** Two rules, not one — they run in opposite
+directions and need to both hold:
 
-BuilderTrend is described elsewhere in this project as "where all of
-the jobsite information is contained... we rely on the data in it to be
-accurate and reliable" — the system of record for a job, not just a
-place things happen to also live. A document that's job-related and
-belongs to a category BuilderTrend actually tracks — contracts, change
-orders, permits/inspections, schedule-affecting documents, vendor/trade
+**Server → BuilderTrend.** A document that's job-related and belongs to
+a category BuilderTrend actually tracks — contracts, change orders,
+permits/inspections, schedule-affecting documents, vendor/trade
 paperwork — should prompt the tool to also ask **"should this go into
 BuilderTrend too?"**, separately from asking where it goes on the file
 server. If yes, that upload goes through the same human-approved
 Browser-Use push-back pattern already built and trusted for BuilderTrend
-data (Phase 3) — never a silent, unconfirmed write into BuilderTrend, for
-the same reason File It's server writes are confirm-then-execute, not
-automatic.
+data (Phase 3) — never a silent, unconfirmed write into BuilderTrend,
+for the same reason File It's server writes are confirm-then-execute,
+not automatic.
 
-**Not every job-related file qualifies** — a reference photo or an
-internal note doesn't need to go into BuilderTrend just because it's
-job-related. This needs its own short category list (which document
-types trigger the question) once Bethany confirms the general shape of
-the rule.
+**BuilderTrend → server.** The reverse also holds, and matters just as
+much: **if something goes on BuilderTrend, it probably also needs to be
+on the server — especially plans or plan documents.** The reasoning is
+explicit, not incidental: *"We want to keep copies of our company
+documents on our company server... it goes back to us wanting to own
+our own data."* This is the same motivation behind the whole ZGX
+project running locally instead of on someone else's cloud — BuilderTrend
+shouldn't become the only copy of anything that matters.
+
+**A real gap this creates — worth naming, not glossing over:** the
+"ask when filing" rule above only fires when someone brings a file
+through File It in the first place. It has no visibility into a plan
+uploaded directly into BuilderTrend by someone who never touched the
+local tool — which is the exact case the "own our own data" principle
+most needs to cover. Closing that gap needs a **pull**, not just a
+prompt: extending the existing nightly BuilderTrend pull (already
+running for Bills/Jobs data, Phase 3) to also check for new
+plans/attachments and either sync them to the server automatically or
+flag them for a human to bring in — not something a chat-time rule can
+guarantee on its own.
+
+**Not every job-related file qualifies for the server→BuilderTrend ask**
+— a reference photo or an internal note doesn't need to go into
+BuilderTrend just because it's job-related. This still needs its own
+short category list (which document types trigger the question).
 
 ## Fallback rule
 
@@ -320,8 +334,10 @@ touch a restricted folder — when in doubt, treat it as restricted.
 ## Open items to resolve before this goes live
 
 1. ~~**HR access list**~~ — **resolved.** See Access control above.
-2. **`video` / `Video to Share`** — purpose unconfirmed; exclude until Bethany describes them.
+2. ~~**`video` / `Video to Share`**~~ — **resolved.** Confirmed unused; permanently excluded.
 3. **`05 Standard Operating Procedures`** is empty — worth deciding whether this becomes the real home for Project 1's harvested workflow content, or stays separate from `99 Best Practices`.
 4. **`04 Marketing Shared` subfolder descriptions** are inferred from names only — need Bethany's confirmation or correction before the tool relies on them. (Write-*access* to the folder itself is now confirmed — this item is only about the subfolder-by-subfolder content guesses.)
 5. **BuilderTrend job name ↔ server folder mapping doesn't exist yet** — needs to be built (see the note under "01 Job-Related — routing is two-part"). Blocks reliable job matching for both filing and any cross-referencing against BuilderTrend/cost data.
-6. **The "also upload to BuilderTrend" rule is proposed, not confirmed** — needs Bethany to correct it or confirm it, and to specify which document types should trigger the question.
+6. ~~**The "also upload to BuilderTrend" rule is proposed, not confirmed**~~ — **confirmed**, and extended to run both directions (server→BuilderTrend and BuilderTrend→server). See "Keeping BuilderTrend and the server in sync" above.
+7. **The document-type list that triggers a BuilderTrend-upload question** still needs defining — right now it's a plausible starting set (contracts, change orders, permits/inspections, schedule docs, vendor/trade paperwork), not a confirmed list.
+8. **The BuilderTrend→server pull mechanism doesn't exist yet** — closing the "own our own data" gap for files that never touch File It needs an extension to the existing nightly BuilderTrend pull (Phase 3), not just a chat-time rule.
