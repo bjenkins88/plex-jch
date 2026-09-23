@@ -13,7 +13,7 @@ FRVW 2026,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT reco
 HBNR2025,05 Active Projects,HBNR 2025-Design,exact-code+year,high,
 HCKS2025,05 Active Projects,HCKS 2025 - Remodel,exact-code+year,high,
 HSMN2024,05 Active Projects,HSMN 2024,exact-code+year,high,
-JDBO2023,05 Active Projects,SP-JDBO 2024,code-match-year-differs,medium,server year 2023 vs BT year 2024 - verify
+JDBO2023,05 Active Projects,,internal-no-bt,n/a,Confirmed by Bethany: internal code for an office remodel - not a client job - no BuilderTrend record and none expected
 JNKS2023,05 Active Projects,JNSN_E&S 2022,fuzzy(0.75),low,unconfirmed - verify manually
 LDDR2025,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 LMND 2023,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
@@ -26,8 +26,7 @@ PRNG2021,05 Active Projects,PRNG 2021 - Design,exact-code+year,high,
 RDRG 2025,05 Active Projects,RDRG 2025-Furnishings; RDRG 2025-Remodel,exact-code+year,high,
 RNNR 2025,05 Active Projects,RNNR 2025 - Design; RNNR 2025 - Interior Design Schedule Only,exact-code+year,high,
 SLDN 2024,05 Active Projects,SLDN 2024 - Design,exact-code+year,high,
-SMTH 2017,05 Active Projects (also seen in Completed - verify),SMTH 2017,exact-code+year,high,
-SMTH2025,05 Active Projects,SMTH 2017; SMTH 2023; SMTH 2026 - Design,code-match-multiple-BT-entries,medium,"3 BT jobs share this code - pick correct one, or all are sub-phases of one project"
+SMTH2025,05 Active Projects,SMTH 2023; SMTH 2026 - Design,code-match-multiple-BT-entries,medium,"2 BT jobs share this code - pick correct one, or both are sub-phases of one project. (SMTH 2017 ruled out - that's the separate, completed SMTH job below.)"
 SYLV 2026,05 Active Projects,SYLV 2026 - Design,exact-code+year,high,
 TJOS2022,05 Active Projects,TJOS 2022,exact-code+year,high,
 TRAVIS CLUB,05 Active Projects,,no-match,none,likely pre-BuilderTrend / no BT record
@@ -113,7 +112,7 @@ OSBN 2013,10 Completed Projects,OSBN 2012; OSBN 2014,code-match-multiple-BT-entr
 OSBN 2014,10 Completed Projects,OSBN 2014,exact-code+year,high,
 OXFD2022,10 Completed Projects,OXFR 2016; OXFR 2022; SP-OXFR 2025,fuzzy(0.75),low,unconfirmed - verify manually
 OXFR2016,10 Completed Projects,OXFR 2016,exact-code+year,high,
-PARADE 2008,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+PARADE 2008,10 Completed Projects,,no-match,none,Confirmed by Bethany: pre-BuilderTrend job (the "Parade Home 08" already referenced in the media-indexing work) - no BT record expected
 PCZT2014,10 Completed Projects,PCZT 2014,exact-code+year,high,
 PHLP2020,10 Completed Projects,PHLP 2020,exact-code+year,high,
 PRCE 2013,10 Completed Projects,PRCE 2014,code-match-year-differs,medium,server year 2013 vs BT year 2014 - verify
@@ -130,6 +129,7 @@ RYNL 2019,10 Completed Projects,RYNL 2019,exact-code+year,high,
 SHFR 2013,10 Completed Projects,SHFR 2013,exact-code+year,high,
 Silver Whisk,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
 SKOBLA 2009,10 Completed Projects,,no-match,none,likely pre-BuilderTrend / no BT record
+SMTH 2017,10 Completed Projects,SMTH 2017,exact-code+year,high,Confirmed by Bethany: this is the completed SMTH job (the folder also appearing under 05 Active Projects was stale/misplaced - see build spec)
 THMP 2021,10 Completed Projects,THMP 2021,exact-code+year,high,
 TNDL 2013,10 Completed Projects,TNDL 2013,exact-code+year,high,
 TRNT 2021,10 Completed Projects,TRNT 2021,exact-code+year,high,

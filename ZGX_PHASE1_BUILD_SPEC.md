@@ -60,24 +60,27 @@ tracked).
   signing while BuilderTrend's year reflects a later re-entry or
   relabeling. Still worth a human glance, but this group is a good bet
   to be correct, not a coin flip.
-- `JDBO2023` (Active) only fuzzy/medium-matched `SP-JDBO 2024` — but
-  "JDBO" reads like it could be an internal/overhead code (Jenkins
-  Design Build...) rather than a client job. Check this one separately
-  before trusting the match.
-- `SMTH 2017` appears in *both* the Active and Completed screenshots —
-  a real duplicate-or-stale-folder question, not a matching-algorithm
-  problem.
-- `PARADE 2008` (no BT match) is almost certainly the same "Parade Home
-  08" already referenced elsewhere in this project's media-indexing
-  work — a pre-BuilderTrend marketing/showcase job, not a missing match
-  to chase.
+
+**Four items confirmed by Bethany, resolved in `job_folder_xref.csv`:**
+- `JDBO2023` — an internal code for an office remodel, not a client
+  job. Correctly has **no** BuilderTrend record, and none should ever
+  be expected — re-tagged `internal-no-bt` rather than left as a
+  low-confidence guess.
+- `SMTH 2017` — the completed job. Re-filed under `10 Completed
+  Projects` as a clean high-confidence match; the copy that showed up
+  in the `05 Active Projects` screenshot was a stale/misplaced folder,
+  not a second real job.
+- `PARADE 2008` — confirmed pre-BuilderTrend, the same "Parade Home 08"
+  already referenced in the media-indexing work.
+- **`20 Inactive Projects` doesn't need this exercise at all** — those
+  jobs were never in BuilderTrend, full stop. Dropped from scope
+  entirely rather than left as an open item to eventually capture.
 
 **Still needed before this is complete:**
-1. `20 Inactive Projects` folder names haven't been captured yet.
-2. Someone needs to actually resolve the medium/low-confidence rows and
-   confirm the 31 no-matches are genuinely pre-BuilderTrend rather than
-   a naming mismatch the algorithm missed.
-3. Once resolved, load `job_folder_xref.csv` into Postgres as the real
+1. Someone needs to actually resolve the remaining medium/low-confidence
+   rows and confirm the rest of the no-matches are genuinely
+   pre-BuilderTrend rather than a naming mismatch the algorithm missed.
+2. Once resolved, load `job_folder_xref.csv` into Postgres as the real
    `server_folder_path` column/table — this file is the draft, not the
    final schema.
 
